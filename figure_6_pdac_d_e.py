@@ -56,11 +56,7 @@ def plot(df):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument( '--data_name', type=str, default='PDAC_64630', help='The name of dataset') # 
-#    parser.add_argument( '--model_name', type=str, help='Name of the trained model', required=True)
     parser.add_argument( '--top_edge_count', type=int, default=1300 ,help='Number of the top communications to plot. To plot all insert -1') # 
-#    parser.add_argument( '--top_percent', type=int, default=20, help='Top N percentage communications to pick')    
-#    parser.add_argument( '--metadata_from', type=str, default='metadata/', help='Path to grab the metadata') 
-#    parser.add_argument( '--output_path', type=str, default='output/', help='Path to save the visualization results, e.g., histograms, graph etc.')
     parser.add_argument( '--barcode_info_file', type=str, default='NEST_figures_input/PDAC_64630_barcode_info', help='Path to load the barcode information file produced during data preprocessing step')
     parser.add_argument( '--annotation_file_path', type=str, default='NEST_figures_input/PDAC_64630_annotation.csv', help='Path to load the annotation file in csv format (if available) ')
     parser.add_argument( '--selfloop_info_file', type=str, default='NEST_figures_input/PDAC_64630_self_loop_record', help='Path to load the selfloop information file produced during data preprocessing step')
