@@ -266,7 +266,7 @@ if __name__ == "__main__":
         tooltip=['component_label'] #,'opacity'
     )
 
-    chart.save(output_name + args.data_name +'_altair_plot.html')
+    chart.save(output_name + args.data_name +'_microglia_altair_plot.html')
     print('Altair plot generation done')
 
     ###################################  Histogram plotting #################################################################################
@@ -279,7 +279,7 @@ if __name__ == "__main__":
     print('len of loaded csv for histogram generation is %d'%len(df))
     df = preprocessDf(df)
     p = plot(df)
-    outPath = output_name + args.data_name + '_histogram_test.html'
+    outPath = output_name + args.data_name + '_microglia_histogram_test.html'
     p.save(outPath)	
     print('Histogram plot generation done')
 
@@ -343,11 +343,11 @@ if __name__ == "__main__":
 
     nt = Network( directed=True, height='1000px', width='100%') #"500px", "500px",, filter_menu=True     
     nt.from_nx(g)
-    nt.save_graph(output_name + args.data_name +'_mygraph.html')
+    nt.save_graph(output_name + args.data_name +'_microglia_mygraph.html')
     print('Edge graph plot generation done')
     ########################################################################
     # convert it to dot file to be able to convert it to pdf or svg format for inserting into the paper
-    write_dot(g, output_name + args.data_name + "_test_interactive.dot")
+    write_dot(g, output_name + args.data_name + "_microglia_test_interactive.dot")
     print('dot file generation done')
     print('All done')
 
