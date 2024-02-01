@@ -62,6 +62,8 @@ if __name__ == "__main__":
     parser.add_argument( '--annotation_file_path', type=str, default='', help='Path to load the annotation file in csv format (if available) ')
     parser.add_argument( '--selfloop_info_file', type=str, default='NEST_figures_input/Female_Naive_id1_self_loop_record', help='Path to load the selfloop information file produced during data preprocessing step')
     parser.add_argument( '--top_ccc_file', type=str, default='NEST_figures_input/Female_Naive_id1_top20percent.csv', help='Path to load the selected top CCC file produced during data postprocessing step')
+    parser.add_argument( '--coordinate_file', type=str, default='NEST_figures_input/Female_Naive_id1_coordinates', help='Path to load the coordinates')
+  
     parser.add_argument( '--output_name', type=str, default='NEST_figures_output/', help='Output file name prefix according to user\'s choice')
     args = parser.parse_args()
 
@@ -71,7 +73,8 @@ if __name__ == "__main__":
     ##################### make cell metadata: barcode_info ###################################
     with gzip.open(args.barcode_info_file, 'rb') as fp:  #b, a:[0:5]        
         barcode_info = pickle.load(fp)    
-
+    with gzip.open(args.coordinate_file, 'rb') as fp:  #b, a:[0:5]   _filtered
+        coordinates = pickle.load(fp)
     ###############################  read which spots have self loops ###############################################################
     with gzip.open(args.selfloop_info_file, 'rb') as fp:  #b, a:[0:5]   _filtered
         self_loop_found = pickle.load(fp)
