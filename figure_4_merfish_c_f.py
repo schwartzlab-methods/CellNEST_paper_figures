@@ -1,4 +1,3 @@
-
 import numpy as np
 import csv
 import pickle
@@ -194,7 +193,7 @@ if __name__ == "__main__":
     print('Histogram plot generation done')
 
     ######################### 3D plotting #####################################################################################################
-    
+    '''
     coordinates_temp = np.zeros((coordinates.shape[0], 3))
     j = 0
     for i in range (0, coordinates.shape[0]):
@@ -207,7 +206,7 @@ if __name__ == "__main__":
     for i in range (0, coordinates.shape[0]):
         for d in range (0, coordinates.shape[1]):
             coordinates[i][d] = coordinates[i][d] #*10
-    '''     
+         
     
     from mpl_toolkits.mplot3d import Axes3D
     def _format_axes(ax):
