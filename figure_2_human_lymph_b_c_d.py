@@ -60,7 +60,7 @@ if __name__ == "__main__":
     parser.add_argument( '--barcode_info_file', type=str, default='NEST_figures_input/V1_Human_Lymph_Node_spatial_barcode_info', help='Path to load the barcode information file produced during data preprocessing step')
     parser.add_argument( '--annotation_file_path', type=str, default='NEST_figures_input/V1_Human_Lymph_Node_spatial_annotation.csv', help='Path to load the annotation file in csv format (if available) ')
     parser.add_argument( '--selfloop_info_file', type=str, default='NEST_figures_input/V1_Human_Lymph_Node_spatial_self_loop_record', help='Path to load the selfloop information file produced during data preprocessing step')
-    parser.add_argument( '--top_ccc_file', type=str, default='NEST_figures_input/V1_Human_Lymph_Node_spatial_Tcell_top20percent.csv', help='Path to load the selected top CCC file produced during data postprocessing step')
+    parser.add_argument( '--top_ccc_file', type=str, default='NEST_figures_input/V1_Human_Lymph_Node_spatial_top20percent.csv', help='Path to load the selected top CCC file produced during data postprocessing step')
     parser.add_argument( '--output_name', type=str, default='NEST_figures_output/', help='Output file name prefix according to user\'s choice')
     args = parser.parse_args()
 
@@ -103,7 +103,7 @@ if __name__ == "__main__":
 
     print(len(csv_record))
 
-    csv_record_final = [df_column_names] + csv_record[0:(len(csv_record)*20)//100] 
+    csv_record_final = [df_column_names] + csv_record #[0:(len(csv_record)*20)//100] 
       
     ## add a dummy row at the end for the convenience of histogram preparation (to keep the color same as altair plot)
     i=0
@@ -155,6 +155,27 @@ if __name__ == "__main__":
 
 
     ########################## filtering ###########
+  
+    ## change the csv_record_final here if you want histogram for specific components/regions only. e.g., if you want to plot only stroma region, or tumor-stroma regions etc.    ##
+    #region_of_interest = [...] 
+    csv_record_final_temp = []
+    csv_record_final_temp.append(csv_record_final[0])
+    component_dictionary_dummy = dict()
+    for record_idx in range (1, len(csv_record_final)-1): #last entry is a dummy for histograms, so ignore it.
+        i = csv_record_final[record_idx][6]
+        j = csv_record_final[record_idx][7]
+        if barcode_type[barcode_info[i][0]] == 'T-cell' and barcode_type[barcode_info[j][0]] == 'T-cell': 
+            csv_record_final_temp.append(csv_record_final[record_idx])
+        if csv_record_final[record_idx][5] not in component_dictionary_dummy:
+            component_dictionary_dummy[csv_record_final[record_idx][5]] = csv_record_final[record_idx]
+            
+    # insert just one record from each other components so that the color scheme does not change in the altair scatter plot and histogram :-(
+    for component_id in component_dictionary_dummy:
+        csv_record_final_temp.append(component_dictionary_dummy[component_id])
+    
+    csv_record_final_temp.append(csv_record_final[len(csv_record_final)-1])
+    csv_record_final = copy.deepcopy(csv_record_final_temp)
+    ###################################################  
     component_list = dict()
     for record_idx in range (1, len(csv_record_final)-1): #last entry is a dummy for histograms, so ignore it.
         record = csv_record_final[record_idx]
