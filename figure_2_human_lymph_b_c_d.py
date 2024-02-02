@@ -60,7 +60,7 @@ if __name__ == "__main__":
     parser.add_argument( '--barcode_info_file', type=str, default='NEST_figures_input/V1_Human_Lymph_Node_spatial_barcode_info', help='Path to load the barcode information file produced during data preprocessing step')
     parser.add_argument( '--annotation_file_path', type=str, default='NEST_figures_input/V1_Human_Lymph_Node_spatial_annotation.csv', help='Path to load the annotation file in csv format (if available) ')
     parser.add_argument( '--selfloop_info_file', type=str, default='NEST_figures_input/V1_Human_Lymph_Node_spatial_self_loop_record', help='Path to load the selfloop information file produced during data preprocessing step')
-    parser.add_argument( '--top_ccc_file', type=str, default='NEST_figures_input/V1_Human_Lymph_Node_spatial_top20percent.csv', help='Path to load the selected top CCC file produced during data postprocessing step')
+    parser.add_argument( '--top_ccc_file', type=str, default='NEST_figures_input/V1_Human_Lymph_Node_spatial_Tcell_top20percent.csv', help='Path to load the selected top CCC file produced during data postprocessing step')
     parser.add_argument( '--output_name', type=str, default='NEST_figures_output/', help='Output file name prefix according to user\'s choice')
     args = parser.parse_args()
 
@@ -92,7 +92,8 @@ if __name__ == "__main__":
 
     #################################################################################################################
     csv_record = df.values.tolist() # barcode_info[i][0], barcode_info[j][0], ligand, receptor, edge_rank, label, i, j, score
-
+    
+    ##########################################################################
     ## sort the edges based on their rank (column 4), low to high, low being higher attention score
     csv_record = sorted(csv_record, key = lambda x: x[4])
     ## add the column names and take first top_edge_count edges
@@ -102,10 +103,7 @@ if __name__ == "__main__":
 
     print(len(csv_record))
 
-    if args.top_edge_count != -1:
-        csv_record_final = [df_column_names] + csv_record [0:min(args.top_edge_count, len(csv_record))]
-    else:
-        csv_record_final = [df_column_names] + csv_record
+    csv_record_final = [df_column_names] + csv_record[0:(len(csv_record)*20)//100] 
       
     ## add a dummy row at the end for the convenience of histogram preparation (to keep the color same as altair plot)
     i=0
@@ -157,27 +155,6 @@ if __name__ == "__main__":
 
 
     ########################## filtering ###########
-    ## change the csv_record_final here if you want histogram for specific components/regions only. e.g., if you want to plot only stroma region, or tumor-stroma regions etc.    ##
-    #region_of_interest = [...] 
-    csv_record_final_temp = []
-    csv_record_final_temp.append(csv_record_final[0])
-    component_dictionary_dummy = dict()
-    for record_idx in range (1, len(csv_record_final)-1): #last entry is a dummy for histograms, so ignore it.
-        i = csv_record_final[record_idx][6]
-        j = csv_record_final[record_idx][7]
-        if barcode_type[barcode_info[i][0]] == 'T-cell' and barcode_type[barcode_info[j][0]] == 'T-cell': 
-            csv_record_final_temp.append(csv_record_final[record_idx])
-        if csv_record_final[record_idx][5] not in component_dictionary_dummy:
-            component_dictionary_dummy[csv_record_final[record_idx][5]] = csv_record_final[record_idx]
-            
-    # insert just one record from each other components so that the color scheme does not change in the altair scatter plot and histogram :-(
-    for component_id in component_dictionary_dummy:
-        csv_record_final_temp.append(component_dictionary_dummy[component_id])
-    
-    csv_record_final_temp.append(csv_record_final[len(csv_record_final)-1])
-    csv_record_final = copy.deepcopy(csv_record_final_temp)
-    
-    #####################################
     component_list = dict()
     for record_idx in range (1, len(csv_record_final)-1): #last entry is a dummy for histograms, so ignore it.
         record = csv_record_final[record_idx]
@@ -285,71 +262,57 @@ if __name__ == "__main__":
     outPath = output_name + args.data_name + '_Tcell_histogram_test.html'
     p.save(outPath)	
     print('Histogram plot generation done')
-
-    ############################  Network/edge graph plot ######################
-
-    set1 = altairThemes.get_colour_scheme("Set1", unique_component_count)
-    colors = set1
-    colors[0] = '#000000' # black means no CCC
-    ids = []
-    x_index=[]
-    y_index=[]
-    colors_point = []
-    for i in range (0, len(barcode_info)):    
-        ids.append(i)
-        x_index.append(barcode_info[i][1])
-        y_index.append(barcode_info[i][2])    
-        colors_point.append(colors[barcode_info[i][3]]) 
-    
-    max_x = np.max(x_index)
-    max_y = np.max(y_index)
-
-
-
-    g = nx.MultiDiGraph(directed=True) 
-    for i in range (0, len(barcode_info)):
-        marker_size = 'circle'
-        label_str =  str(i)+'_c:'+str(barcode_info[i][3]) #  label of the node or spot is consists of: spot id, component number
-        if args.annotation_file_path != '':
-            label_str = label_str +'_'+ str(barcode_type[barcode_info[i][0]]) # also add the type of the spot to the label if annotation is available 
-        
-        g.add_node(int(ids[i]), x=int(x_index[i]), y=int(y_index[i]), label = label_str, pos = str(x_index[i])+","+str(-y_index[i])+" !", physics=False, shape = marker_size, color=matplotlib.colors.rgb2hex(colors_point[i]))    
-
-
-
-    # scale the edge scores [0 to 1] to make plot work
-    score_list = []
-    for k in range (1, len(csv_record_final)-1):
-        score_list.append(csv_record_final[k][8])
-
-    min_score = np.min(score_list)
-    max_score = np.max(score_list)
-
-    count_edges = 0
-    for k in range (1, len(csv_record_final)-1):
+    ################################ Density Curve #############################
+    combined_score_distribution_ccl19_ccr7 = []
+    combined_score_distribution = []
+    # 63470 is the length of csv_record_final (number of records in Tcell zone)
+    for k in range (1, len(csv_record_final)-1): 
         i = csv_record_final[k][6]
-        j = csv_record_final[k][7] 
-
+        j = csv_record_final[k][7]
         ligand = csv_record_final[k][2]
         receptor = csv_record_final[k][3]
+        if ligand =='CCL19' and receptor == 'CCR7':
+            combined_score_distribution_ccl19_ccr7.append(csv_record_final[k][8])
+        else:
+            combined_score_distribution.append(csv_record_final[k][8])
+            
+    some_dict = dict(A=combined_score_distribution, B=combined_score_distribution_ccl19_ccr7)
+    
+    df = pd.DataFrame(dict([(key, pd.Series(value)) for key, value in some_dict.items()]))
+    
+    df = df.rename(columns={'A': 'all_pairs', 'B': 'CCL19_CCR7'})
+    
+    source = df
+    #########################################################################
+    chart = alt.Chart(source).transform_fold(
+        ['all_pairs',
+         'CCL19_CCR7'],
+        as_ = ['distribution_type', 'value']
+    ).transform_density(
+        density = 'value',
+        groupby=['distribution_type'],        
+        steps=200
+    ).mark_area(opacity=0.9).encode(
+        alt.X('value:Q'),
+        alt.Y('density:Q', stack='zero' ),
+        alt.Color('distribution_type:N')
+    )
+    ####################### or ###################################### 
+    '''
+    chart = alt.Chart(source).transform_fold(
+        ['all_pairs', 'CCL19_CCR7'],
+        as_=['Distribution Type', 'Attention Score']
+    ).mark_bar(
+        opacity=0.5,
+        binSpacing=0
+    ).encode(
+        alt.X('Attention Score:Q', bin=alt.Bin(maxbins=100)),
+        alt.Y('count()', stack='zero'),
+        alt.Color('Distribution Type:N')
+    )
+    '''
+    ###########################################################################
+    chart.save(output_name + args.data_name +'_Tcell_attention_distribution.html')  
+    
 
-        #if ligand=='CCL19' and receptor=='CCR7':
-        #    print('CCL19-CCR7')
-
-        edge_score = csv_record_final[k][8]
-        edge_score = (edge_score-min_score)/(max_score-min_score)   
-        title_str =  "L:" + ligand + ", R:" + receptor+ ", "+ str(edge_score) #+
-        g.add_edge(int(i), int(j), label = title_str, color=colors_point[i], value=np.float64(edge_score)) #
-        count_edges = count_edges + 1
-
-    print("total edges plotted: %d"%count_edges)
-
-    nt = Network( directed=True, height='1000px', width='100%') #"500px", "500px",, filter_menu=True     
-    nt.from_nx(g)
-    nt.save_graph(output_name + args.data_name +'_mygraph.html')
-    print('Edge graph plot generation done')
-    ########################################################################
-    # convert it to dot file to be able to convert it to pdf or svg format for inserting into the paper
-    write_dot(g, output_name + args.data_name + "_test_interactive.dot")
-    print('dot file generation done')
-    print('All done')
+   
