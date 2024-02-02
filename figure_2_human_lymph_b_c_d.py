@@ -79,7 +79,7 @@ if __name__ == "__main__":
     annotation_data = pd.read_csv(args.annotation_file_path, sep=",")
     pathologist_label=[]
     for i in range (0, len(annotation_data)):
-        pathologist_label.append([annotation_data['Barcode'][i], annotation_data['IX_annotation'][i]])
+        pathologist_label.append([annotation_data['Barcode'][i], annotation_data['Type'][i]])
 
     barcode_type=dict() # record the type (annotation) of each spot (barcode)
     for i in range (0, len(pathologist_label)):
@@ -157,7 +157,6 @@ if __name__ == "__main__":
 
 
     ########################## filtering ###########
-    '''
     ## change the csv_record_final here if you want histogram for specific components/regions only. e.g., if you want to plot only stroma region, or tumor-stroma regions etc.    ##
     #region_of_interest = [...] 
     csv_record_final_temp = []
@@ -177,7 +176,7 @@ if __name__ == "__main__":
     
     csv_record_final_temp.append(csv_record_final[len(csv_record_final)-1])
     csv_record_final = copy.deepcopy(csv_record_final_temp)
-    '''
+    
     #####################################
     component_list = dict()
     for record_idx in range (1, len(csv_record_final)-1): #last entry is a dummy for histograms, so ignore it.
@@ -270,7 +269,7 @@ if __name__ == "__main__":
         tooltip=['component_label'] #,'opacity'
     )
 
-    chart.save(output_name + args.data_name +'_altair_plot.html')
+    chart.save(output_name + args.data_name +'_Tcell_altair_plot.html')
     print('Altair plot generation done')
 
     ###################################  Histogram plotting #################################################################################
@@ -283,7 +282,7 @@ if __name__ == "__main__":
     print('len of loaded csv for histogram generation is %d'%len(df))
     df = preprocessDf(df)
     p = plot(df)
-    outPath = output_name + args.data_name + '_histogram_test.html'
+    outPath = output_name + args.data_name + '_Tcell_histogram_test.html'
     p.save(outPath)	
     print('Histogram plot generation done')
 
