@@ -176,6 +176,7 @@ if __name__ == "__main__":
     csv_record_final_temp.append(csv_record_final[len(csv_record_final)-1])
     csv_record_final = copy.deepcopy(csv_record_final_temp)
     '''
+  
     #####################################
     component_list = dict()
     for record_idx in range (1, len(csv_record_final)-1): #last entry is a dummy for histograms, so ignore it.
