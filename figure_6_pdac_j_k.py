@@ -154,30 +154,7 @@ if __name__ == "__main__":
         csv_record_final[record][5] = label
 
 
-    ########################## filtering ###########
-    '''
-    ## change the csv_record_final here if you want histogram for specific components/regions only. e.g., if you want to plot only stroma region, or tumor-stroma regions etc.    ##
-    #region_of_interest = [...] 
-    csv_record_final_temp = []
-    csv_record_final_temp.append(csv_record_final[0])
-    component_dictionary_dummy = dict()
-    for record_idx in range (1, len(csv_record_final)-1): #last entry is a dummy for histograms, so ignore it.
-        i = csv_record_final[record_idx][6]
-        j = csv_record_final[record_idx][7]
-        if barcode_type[barcode_info[i][0]] == 'T-cell' and barcode_type[barcode_info[j][0]] == 'T-cell': 
-            csv_record_final_temp.append(csv_record_final[record_idx])
-        if csv_record_final[record_idx][5] not in component_dictionary_dummy:
-            component_dictionary_dummy[csv_record_final[record_idx][5]] = csv_record_final[record_idx]
-            
-    # insert just one record from each other components so that the color scheme does not change in the altair scatter plot and histogram :-(
-    for component_id in component_dictionary_dummy:
-        csv_record_final_temp.append(component_dictionary_dummy[component_id])
-    
-    csv_record_final_temp.append(csv_record_final[len(csv_record_final)-1])
-    csv_record_final = copy.deepcopy(csv_record_final_temp)
-    '''
-  
-    #####################################
+
     component_list = dict()
     for record_idx in range (1, len(csv_record_final)-1): #last entry is a dummy for histograms, so ignore it.
         record = csv_record_final[record_idx]
@@ -310,11 +287,12 @@ if __name__ == "__main__":
     for i in range (0, len(barcode_info)):        
         marker_size = 'circle'
         label_str =  str(i)+'_c:'+str(barcode_info[i][3]) #  label of the node or spot is consists of: spot id, component number
-        if args.annotation_file_path != '':
-            label_str = label_str +'_'+ str(barcode_type[barcode_info[i][0]]) # also add the type of the spot to the label if annotation is available 
-            if str(barcode_type[barcode_info[i][0]]) == 'tumor': # Tumour
+        if args.annotation_file_path != '': # also add the type of the spot to the label if annotation is available 
+            if 'tumor' in str(barcode_type[barcode_info[i][0]]): # Tumour
                 marker_size = 'box'
-        
+                label_str = label_str +'_'+ 'tumor'
+            else:
+                label_str = label_str +'_'+ str(barcode_type[barcode_info[i][0]]) 
         g.add_node(int(ids[i]), x=int(x_index[i]), y=int(y_index[i]), label = label_str, pos = str(x_index[i])+","+str(-y_index[i])+" !", physics=False, shape = marker_size, color=matplotlib.colors.rgb2hex(colors_point[i]))    
 
 
@@ -333,9 +311,6 @@ if __name__ == "__main__":
 
         ligand = csv_record_final[k][2]
         receptor = csv_record_final[k][3]
-
-        #if ligand=='CCL19' and receptor=='CCR7':
-        #    print('CCL19-CCR7')
 
         edge_score = csv_record_final[k][8]
         edge_score = (edge_score-min_score)/(max_score-min_score)   
