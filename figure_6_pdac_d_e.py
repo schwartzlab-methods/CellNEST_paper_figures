@@ -58,7 +58,7 @@ if __name__ == "__main__":
     parser.add_argument( '--data_name', type=str, default='PDAC_64630', help='The name of dataset') # 
     parser.add_argument( '--top_edge_count', type=int, default=1300 ,help='Number of the top communications to plot. To plot all insert -1') # 
     parser.add_argument( '--barcode_info_file', type=str, default='NEST_figures_input/PDAC_64630_barcode_info', help='Path to load the barcode information file produced during data preprocessing step')
-    parser.add_argument( '--annotation_file_path', type=str, default='NEST_figures_input/PDAC_64630_annotation.csv', help='Path to load the annotation file in csv format (if available) ')
+    parser.add_argument( '--annotation_file_path', type=str, default='NEST_figures_input/PDAC_64630_annotation.csv', help='Path to load the annotation file in csv format (if available) ') #_ayah_histology
     parser.add_argument( '--selfloop_info_file', type=str, default='NEST_figures_input/PDAC_64630_self_loop_record', help='Path to load the selfloop information file produced during data preprocessing step')
     parser.add_argument( '--top_ccc_file', type=str, default='NEST_figures_input/PDAC_64630_top20percent.csv', help='Path to load the selected top CCC file produced during data postprocessing step')
     parser.add_argument( '--output_name', type=str, default='NEST_figures_output/', help='Output file name prefix according to user\'s choice')
@@ -79,7 +79,7 @@ if __name__ == "__main__":
     annotation_data = pd.read_csv(args.annotation_file_path, sep=",")
     pathologist_label=[]
     for i in range (0, len(annotation_data)):
-        pathologist_label.append([annotation_data['Barcode'][i], annotation_data['IX_annotation'][i]])
+        pathologist_label.append([annotation_data['Barcode'][i], annotation_data['IX_annotation'][i]]) #ayah histology
 
     barcode_type=dict() # record the type (annotation) of each spot (barcode)
     for i in range (0, len(pathologist_label)):
@@ -306,14 +306,15 @@ if __name__ == "__main__":
 
 
     g = nx.MultiDiGraph(directed=True) 
-    for i in range (0, len(barcode_info)):
+    for i in range (0, len(barcode_info)):        
         marker_size = 'circle'
         label_str =  str(i)+'_c:'+str(barcode_info[i][3]) #  label of the node or spot is consists of: spot id, component number
         if args.annotation_file_path != '':
             label_str = label_str +'_'+ str(barcode_type[barcode_info[i][0]]) # also add the type of the spot to the label if annotation is available 
+            if str(barcode_type[barcode_info[i][0]]) == 'tumor': # Tumour
+                marker_size = 'box'
         
         g.add_node(int(ids[i]), x=int(x_index[i]), y=int(y_index[i]), label = label_str, pos = str(x_index[i])+","+str(-y_index[i])+" !", physics=False, shape = marker_size, color=matplotlib.colors.rgb2hex(colors_point[i]))    
-
 
 
     # scale the edge scores [0 to 1] to make plot work
@@ -351,4 +352,13 @@ if __name__ == "__main__":
     # convert it to dot file to be able to convert it to pdf or svg format for inserting into the paper
     write_dot(g, output_name + args.data_name + "_test_interactive.dot")
     print('dot file generation done')
+    # converting *.dot to *.pdf ############################################ 
+    dot_file_name = output_name + args.data_name + "_test_interactive.dot"
+    
+    shell_command = "cat "+ dot_file_name + "| sed 's/ellipse/triangle/g'   | sed 's/Tumour\",/Tumour\",style=\"filled\",/g'   | sed 's/L:\([^ ]\+\), R:/\1-/g'   | sed 's/label=\"[0-9][^\"]*\"/label=\"\"/g' | awk -F'=' '{ if ($1 == \"penwidth\") {print $1 \"=\" ($2 ^ 6) \",\"} else {print $0 }}'   | tr '\n' ' '   | sed \"s/;/\n/g\"  > tmp"
+    
+    os.system(shell_command)
+    ###### to svg ########
+    shell_command = 'cat tmp   | dot -Kneato -n -y -Tsvg -Efontname="Arial" -Nlabel="" -Nwidth=1.5 -Nheight=1.5 -Npenwidth=20 -Epenwidth=20 > test.svg'
+    
     print('All done')
