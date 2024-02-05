@@ -55,9 +55,9 @@ def plot(df):
 ####################### Set the name of the sample you want to visualize ###################################
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument( '--data_name', type=str, default='PDAC_64630', help='The name of dataset') # 
-    parser.add_argument( '--barcode_info_file', type=str, default='NEST_figures_input/PDAC_64630_barcode_info', help='Path to load the barcode information file produced during data preprocessing step')
-    parser.add_argument( '--annotation_file_path', type=str, default='NEST_figures_input/PDAC_64630_annotation_ayah_morphology.csv', help='Path to load the annotation file in csv format (if available) ') #_ayah_histology
+    parser.add_argument( '--data_name', type=str, default='PDAC_140694', help='The name of dataset') # 
+    parser.add_argument( '--barcode_info_file', type=str, default='NEST_figures_input/PDAC_140694_barcode_info', help='Path to load the barcode information file produced during data preprocessing step')
+    parser.add_argument( '--annotation_file_path', type=str, default='NEST_figures_input/PDAC_140694_annotation_ayah_morphology.csv', help='Path to load the annotation file in csv format (if available) ') #_ayah_histology
     parser.add_argument( '--output_name', type=str, default='NEST_figures_output/', help='Output file name prefix according to user\'s choice')
     args = parser.parse_args()
 
@@ -71,7 +71,7 @@ if __name__ == "__main__":
     annotation_data = pd.read_csv(args.annotation_file_path, sep=",")
     pathologist_label=[]
     for i in range (0, len(annotation_data)):
-        pathologist_label.append([annotation_data['Barcode'][i], annotation_data['tumour morphology'][i]]) 
+        pathologist_label.append([annotation_data['Barcode'][i], annotation_data['Tumour morphology'][i]]) 
 
     barcode_type=dict() # record the type (annotation) of each spot (barcode)
     for i in range (0, len(pathologist_label)):
