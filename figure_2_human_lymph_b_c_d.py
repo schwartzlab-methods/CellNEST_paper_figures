@@ -61,6 +61,7 @@ if __name__ == "__main__":
     parser.add_argument( '--annotation_file_path', type=str, default='NEST_figures_input/V1_Human_Lymph_Node_spatial_annotation.csv', help='Path to load the annotation file in csv format (if available) ')
     parser.add_argument( '--selfloop_info_file', type=str, default='NEST_figures_input/V1_Human_Lymph_Node_spatial_self_loop_record', help='Path to load the selfloop information file produced during data preprocessing step')
     parser.add_argument( '--top_ccc_file', type=str, default='NEST_figures_input/V1_Human_Lymph_Node_spatial_top20percent.csv', help='Path to load the selected top CCC file produced during data postprocessing step')
+    parser.add_argument( '--input_edge_file', type=str, default='NEST_figures_input/V1_Human_Lymph_Node_spatial_input_graph.csv', help='Input edge list file name')
     parser.add_argument( '--output_name', type=str, default='NEST_figures_output/', help='Output file name prefix according to user\'s choice')
     args = parser.parse_args()
 
@@ -315,7 +316,61 @@ if __name__ == "__main__":
         steps=200
     ).mark_area(opacity=0.9).encode(
         alt.X('value:Q'),
-        alt.Y('density:Q', stack='zero' ),
+        alt.Y('density:Q', stack=None ),
+        alt.Color('distribution_type:N')
+    )
+    ####################### or ###################################### 
+    '''
+    chart = alt.Chart(source).transform_fold(
+        ['all_pairs', 'CCL19_CCR7'],
+        as_=['Distribution Type', 'Attention Score']
+    ).mark_bar(
+        opacity=0.5,
+        binSpacing=0
+    ).encode(
+        alt.X('Attention Score:Q', bin=alt.Bin(maxbins=100)),
+        alt.Y('count()', stack='zero'),
+        alt.Color('Distribution Type:N')
+    )
+    '''
+    chart.save(output_name + args.data_name +'_Tcell_attention_distribution.html')  
+    ##################################################################################################################
+    df = pd.read_csv(args.input_edge_file, sep=",", header=None)
+
+    input_score_distribution_ccl19_ccr7 = []
+    input_score_distribution = []
+    # 63470 is the length of csv_record_final (number of records in Tcell zone)
+    for k in range (0, len(df)): 
+        i = df[0][k]
+        j = df[1][k]
+        ligand = df[3][k]
+        receptor = df[4][k]
+        score = df[2][k]
+        if barcode_type[barcode_info[i][0]]=='T-cell' and barcode_type[barcode_info[j][0]]=='T-cell': 
+            if ligand =='CCL19' and receptor == 'CCR7':
+                input_score_distribution_ccl19_ccr7.append(score)
+            else:
+                input_score_distribution.append(score)
+            
+    some_dict = dict(A=input_score_distribution, B=input_score_distribution_ccl19_ccr7)
+    
+    df = pd.DataFrame(dict([(key, pd.Series(value)) for key, value in some_dict.items()]))
+    
+    df = df.rename(columns={'A': 'all_pairs', 'B': 'CCL19_CCR7'})
+    
+    source = df
+    #########################################################################
+    chart = alt.Chart(source).transform_fold(
+        ['all_pairs',
+         'CCL19_CCR7'],
+        as_ = ['distribution_type', 'value']
+    ).transform_density(
+        density = 'value',
+        groupby=['distribution_type'],        
+        steps=0.5
+    ).mark_area(opacity=0.9).encode(
+        alt.X('value:Q'),
+        alt.Y('density:Q', stack=None ),
         alt.Color('distribution_type:N')
     )
     ####################### or ###################################### 
@@ -333,7 +388,6 @@ if __name__ == "__main__":
     )
     '''
     ###########################################################################
-    chart.save(output_name + args.data_name +'_Tcell_attention_distribution.html')  
+    chart.save(output_name + args.data_name +'_Tcell_input_coexpression_distribution.html')  
     
 
-   
