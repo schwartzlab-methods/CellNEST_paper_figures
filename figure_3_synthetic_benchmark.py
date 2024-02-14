@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument( '--data_path', type=str, default='NEST_figures_input/' , help='The path to dataset') 
+parser.add_argument( '--data_path', type=str, default='NEST_figures_input_synthetic/' , help='The path to dataset') 
 parser.add_argument( '--output_path', type=str, default='NEST_figures_output/' , help='The path to dataset') 
 
 args = parser.parse_args()
