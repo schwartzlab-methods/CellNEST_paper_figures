@@ -56,8 +56,8 @@ def plot(df):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument( '--data_name', type=str, default='PDAC_64630', help='The name of dataset') # 
-    parser.add_argument( '--barcode_info_file', type=str, default='NEST_figures_input/PDAC_64630_barcode_info', help='Path to load the barcode information file produced during data preprocessing step')
-    parser.add_argument( '--annotation_file_path', type=str, default='NEST_figures_input/PDAC_64630_annotation_ayah_morphology.csv', help='Path to load the annotation file in csv format (if available) ') #_ayah_histology
+    parser.add_argument( '--barcode_info_file', type=str, default='NEST_figures_input_PDAC/PDAC_64630_barcode_info', help='Path to load the barcode information file produced during data preprocessing step')
+    parser.add_argument( '--annotation_file_path', type=str, default='NEST_figures_input_PDAC/PDAC_64630_annotation_ayah_morphology.csv', help='Path to load the annotation file in csv format (if available) ') #_ayah_histology
     parser.add_argument( '--output_name', type=str, default='NEST_figures_output/', help='Output file name prefix according to user\'s choice')
     args = parser.parse_args()
 
