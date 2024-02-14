@@ -57,11 +57,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument( '--data_name', type=str, default='V1_Human_Lymph_Node_spatial', help='The name of dataset') # 
     parser.add_argument( '--top_edge_count', type=int, default= -1,help='Number of the top communications to plot. To plot all insert -1') # 
-    parser.add_argument( '--barcode_info_file', type=str, default='NEST_figures_input/V1_Human_Lymph_Node_spatial_barcode_info', help='Path to load the barcode information file produced during data preprocessing step')
-    parser.add_argument( '--annotation_file_path', type=str, default='NEST_figures_input/V1_Human_Lymph_Node_spatial_annotation.csv', help='Path to load the annotation file in csv format (if available) ')
-    parser.add_argument( '--selfloop_info_file', type=str, default='NEST_figures_input/V1_Human_Lymph_Node_spatial_self_loop_record', help='Path to load the selfloop information file produced during data preprocessing step')
-    parser.add_argument( '--top_ccc_file', type=str, default='NEST_figures_input/V1_Human_Lymph_Node_spatial_top20percent.csv', help='Path to load the selected top CCC file produced during data postprocessing step')
-    parser.add_argument( '--input_edge_file', type=str, default='NEST_figures_input/V1_Human_Lymph_Node_spatial_input_graph.csv', help='Input edge list file name')
+    parser.add_argument( '--barcode_info_file', type=str, default='NEST_figures_input_human_lymph/V1_Human_Lymph_Node_spatial_barcode_info', help='Path to load the barcode information file produced during data preprocessing step')
+    parser.add_argument( '--annotation_file_path', type=str, default='NEST_figures_input_human_lymph/V1_Human_Lymph_Node_spatial_annotation.csv', help='Path to load the annotation file in csv format (if available) ')
+    parser.add_argument( '--selfloop_info_file', type=str, default='NEST_figures_input_human_lymph/V1_Human_Lymph_Node_spatial_self_loop_record', help='Path to load the selfloop information file produced during data preprocessing step')
+    parser.add_argument( '--top_ccc_file', type=str, default='NEST_figures_input_human_lymph/V1_Human_Lymph_Node_spatial_top20percent.csv', help='Path to load the selected top CCC file produced during data postprocessing step')
+    parser.add_argument( '--input_edge_file', type=str, default='NEST_figures_input_human_lymph/V1_Human_Lymph_Node_spatial_input_graph.csv', help='Input edge list file name')
     parser.add_argument( '--output_name', type=str, default='NEST_figures_output/', help='Output file name prefix according to user\'s choice')
     args = parser.parse_args()
 
