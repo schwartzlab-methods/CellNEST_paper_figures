@@ -27,7 +27,7 @@ DefaultAssay(lymph) <- "Spatial"
 lymph <- NormalizeData(lymph)
 
 lymph <- SeuratWrappers::RunALRA(lymph)
-lr_db <- read.csv("/cluster/home/t116508uhn/64630/lr_cellchat_nichenet.csv")
+lr_db <- read.csv("NEST_figures_input_PDAC/lr_cellchat_nichenet.csv")
 NICHES_output <- RunNICHES(object = lymph,
                            LR.database = "custom",
                            custom_LR_database = lr_db,
