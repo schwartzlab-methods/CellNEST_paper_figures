@@ -173,7 +173,7 @@ if __name__ == "__main__":
 
 
     
-    ######## chi square test #######
+    ######## preprocessing for chi-square and hypergeometric test ####################################################
     total_count = len(csv_record_final_temp)-1
     total_type = len(list(ligand_receptor_pair.keys()))
 
@@ -200,7 +200,7 @@ if __name__ == "__main__":
         print('%d, %d, %d'%(i, occurance_percentage[i], f_obs[i]))
 
 
-
+    ######## Hypergeometric test ####################################################
 
     from scipy.stats import multivariate_hypergeom
 
@@ -213,7 +213,7 @@ if __name__ == "__main__":
     # — something must be going on with this jar.    
     # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.multivariate_hypergeom.html
 
-
+    ######## chi-square test ####################################################
     degree_of_freedom = total_type - 1
     f_obs = np.array(f_obs)
     chisqr = scipy.stats.chisquare(f_obs)    
