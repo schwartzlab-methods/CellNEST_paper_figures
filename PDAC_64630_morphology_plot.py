@@ -25,33 +25,6 @@ alt.themes.register("publishTheme", altairThemes.publishTheme)
 alt.themes.enable("publishTheme")
 
 
-#current_directory = ??
-
-##########################################################
-# preprocessDf, plot: these two functions are taken from GW's repository                                                                                                                                                                     /mnt/data0/gw/research/notta_pancreatic_cancer_visium/plots/fatema_signaling/hist.py                                                                                                                                                                                         
-
-def preprocessDf(df):
-  """Transform ligand and receptor columns."""
-  df["ligand-receptor"] = df["ligand"] + '-' + df["receptor"]
-  df["component"] = df["component"] #.astype(str).str.zfill(2)
-
-  return df
-
-
-def plot(df):
-  set1 = altairThemes.get_colour_scheme("Set1", len(df["component"].unique()))
-  set1[0] = '#000000'
-  base = alt.Chart(df).mark_bar().encode(
-            x=alt.X("ligand-receptor:N", axis=alt.Axis(labelAngle=45), sort='-y'),
-            y=alt.Y("count()"),
-            color=alt.Color("component:N", scale = alt.Scale(range=set1)),
-            order=alt.Order("component:N", sort="ascending"),
-            tooltip=["component"]
-        )
-  p = base
-
-  return p
-
 ####################### Set the name of the sample you want to visualize ###################################
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
