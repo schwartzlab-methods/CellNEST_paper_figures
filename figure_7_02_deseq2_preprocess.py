@@ -27,6 +27,7 @@ def subset_pdos(data_dir, input_file, pure_ids):
     # only consider Basal-like & Classical samples
     df_pure = df_pure[df_pure["Tumor_PDO_Subtype_Notta"] != "Hybrid"]
     # convert from the Classical and Basal-like A/B subtype scheme to Classical and Basal-like subtype scheme
+    
     basal_mask = df_pure["Tumor_PDO_Subtype_Notta"].str.contains(
         "Basal-like", case=False
     )
@@ -35,6 +36,7 @@ def subset_pdos(data_dir, input_file, pure_ids):
     )
     df_pure.loc[basal_mask, "Modified_Tumor_PDO_Subtype_Notta"] = "Basal-like"
     df_pure.loc[classical_mask, "Modified_Tumor_PDO_Subtype_Notta"] = "Classical"
+    
 
     return df_pure
 
@@ -56,10 +58,10 @@ def deseq2_meta_prep(pdo_meta):
         {
             "sample": pdo_meta["Full_name"],
             "type": "organoid",
-            "subtype": pdo_meta["Modified_Tumor_PDO_Subtype_Notta"],
+            "subtype": pdo_meta["Tumor_Subtype_Moffit"],
         }
     )
-
+    print(pre_deseq2_pdo_meta)
     return pre_deseq2_pdo_meta
 
 
