@@ -204,11 +204,13 @@ if __name__ == "__main__":
 
     from scipy.stats import multivariate_hypergeom
 
-    m_data = f_obs
-    n_data = sample_size 
-    x_data = occurance_percentage
-     
+    m_data = f_obs # actual observation count for each lr-pair (variable)
+    n_data = sample_size # total draw = 100
+    x_data = occurance_percentage # expected count of draw from each lr-pair. For PLXNB2-MET = 20%  
+    # Null hypothesis: Out of 100 draw, only PLXNB2-MET is chosen 20% of the time (the rest 80% are distributed among the rest 217 pairs), just by chance. 
+    # Alternative hypothesis: Out of 100 draw, only PLXNB2-MET is chosen 20% of the time NOT by chance, but because it is biased. 
     print('hypergeometric probability of null hypothesis: PLXNB2-MET wil be selected most of the time out of %d draws just by chance is: %g' % (n_data, multivariate_hypergeom.pmf(x=x_data, m=m_data, n=n_data)))
+    # p-value < 0.05 -- so reject the null hypothesis and accept the alternative hypothesis.
     # the null hypothesis that there is nothing special about the jar. If this probability (also called the p-value) is sufficiently low, then we can decide to reject the null hypothesis as too unlikely 
     # — something must be going on with this jar.    
     # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.multivariate_hypergeom.html
@@ -216,8 +218,10 @@ if __name__ == "__main__":
     ######## chi-square test ####################################################
     degree_of_freedom = total_type - 1
     f_obs = np.array(f_obs)
-    chisqr = scipy.stats.chisquare(f_obs)    
+    chisqr = scipy.stats.chisquare(f_obs)   
+    # Null hypothesis: All lr-pairs occur the equal number of times.
+    # Alternative hypothesis: Some lr-pairs are occurring significantly more number of times than the rest. So it is skewed. 
     print('total_count %d, total_type %d, degree of freedom %d, chi square test statistic p-value of all having equal probability of occurance = %g '%(total_count, total_type, degree_of_freedom, chisqr[1])) 
     # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.chisquare.html   
-   
+    # p-value < 0.05 -- so reject the null hypothesis and accept the alternative hypothesis.
 
