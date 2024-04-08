@@ -123,7 +123,7 @@ if __name__ == "__main__":
             
     graph = csr_matrix(connecting_edges)
     n_components, labels = connected_components(csgraph=graph,directed=True, connection = 'weak',  return_labels=True) # It assigns each SPOT to a component based on what pair it belongs to
-    print('Number of connected components %d'%n_components) 
+#    print('Number of connected components %d'%n_components) 
 
     count_points_component = np.zeros((n_components))
     for i in range (0, len(labels)):
@@ -200,22 +200,30 @@ if __name__ == "__main__":
             continue        
         ligand = csv_record_final[k][2]
         receptor = csv_record_final[k][3]
-        each_node_outgoing[i].append([j, ligand, receptor])
+        each_node_outgoing[i].append([j, ligand, receptor, k]) 
     
-    # all possible 2 hop pattern count
+    # all possible 2-hop pattern count
     pattern_distribution = defaultdict(list)
     # pattern_distribution['ligand-receptor to ligand-receptor']=[1,1,1,1, ...]
+    edge_list_2hop = []
+    target_relay = "LGALS3-ITGB4 to TGFB1-ENG"
     for i in each_node_outgoing:
         for tupple in each_node_outgoing[i]: # first hop
             j = tupple[0]
             lig_rec_1 = tupple[1]+'-'+tupple[2]
+            record_id_1 = tupple[3]
             if j in each_node_outgoing:
                 for tupple_next in each_node_outgoing[j]: # second hop
                     k = tupple_next[0]
                     if k == i or k == j:
                         continue
                     lig_rec_2 = tupple_next[1]+'-'+tupple_next[2]
+                    record_id_2 = tupple_next[3]
                     pattern_distribution[lig_rec_1 + ' to ' + lig_rec_2].append(1)
+                    relay = lig_rec_1 + ' to ' + lig_rec_2
+                    if relay == target_relay:
+                        edge_list_2hop.append([record_id_1,record_id_2])
+    
     
 
     two_hop_pattern_distribution = []
@@ -226,7 +234,7 @@ if __name__ == "__main__":
         #if lig_rec_1 == lig_rec_2:
         #    same_count = same_count + 1
     
-    two_hop_pattern_distribution = sorted(two_hop_pattern_distribution, key = lambda x: x[1], reverse=True) 
+    two_hop_pattern_distribution = sorted(two_hop_pattern_distribution, key = lambda x: x[1], reverse=True) # high to low
     
     data_list=dict()
     data_list['X']=[]
@@ -244,3 +252,69 @@ if __name__ == "__main__":
 
     chart.save(output_name + args.data_name +'_pattern_distribution.html')
 
+    ######################### Plotting the two hops #####################
+    set1 = altairThemes.get_colour_scheme("Set1", unique_component_count)
+    colors = set1
+    colors[0] = '#000000' # black means no CCC
+    ids = []
+    x_index=[]
+    y_index=[]
+    colors_point = []
+    for i in range (0, len(barcode_info)):    
+        ids.append(i)
+        x_index.append(barcode_info[i][1])
+        y_index.append(barcode_info[i][2])    
+        colors_point.append(colors[barcode_info[i][3]]) 
+    
+    max_x = np.max(x_index)
+    max_y = np.max(y_index)
+
+
+
+    g = nx.MultiDiGraph(directed=True) 
+    for i in range (0, len(barcode_info)):        
+        marker_size = 'circle'
+        label_str =  str(i)+'_c:'+str(barcode_info[i][3]) #  label of the node or spot is consists of: spot id, component number
+        if args.annotation_file_path != '':
+            label_str = label_str +'_'+ str(barcode_type[barcode_info[i][0]]) # also add the type of the spot to the label if annotation is available 
+            if str(barcode_type[barcode_info[i][0]]) == 'tumor': # Tumour
+                marker_size = 'box'
+        
+        g.add_node(int(ids[i]), x=int(x_index[i]), y=int(y_index[i]), label = label_str, pos = str(x_index[i])+","+str(-y_index[i])+" !", physics=False, shape = marker_size, color=matplotlib.colors.rgb2hex(colors_point[i]))    
+
+
+    # scale the edge scores [0 to 1] to make width in the plot work
+    score_list = []
+    for k in range (1, len(csv_record_final)-1):
+        score_list.append(csv_record_final[k][8])
+
+    min_score = np.min(score_list)
+    max_score = np.max(score_list)
+
+    count_edges = 0
+    for relay in edge_list_2hop:
+        print(relay)
+        for hop in range (0, len(relay)):
+            k = relay[hop] # record id for the hops
+            
+            i = csv_record_final[k][6]
+            j = csv_record_final[k][7] 
+            print('%d %d'%(i, j))
+            ligand = csv_record_final[k][2]
+            receptor = csv_record_final[k][3]            
+            edge_score = csv_record_final[k][8]
+            edge_score = (edge_score-min_score)/(max_score-min_score)   
+            title_str =  "L:" + ligand + ", R:" + receptor+ ", "+ str(edge_score) #+
+            g.add_edge(int(i), int(j), label = title_str, color=colors_point[i], value=np.float64(edge_score)) #
+            count_edges = count_edges + 1
+
+    print("total edges plotted: %d"%count_edges)
+
+    nt = Network( directed=True, height='1000px', width='100%') #"500px", "500px",, filter_menu=True     
+    nt.from_nx(g)
+    nt.save_graph(output_name + args.data_name +'_relay_mygraph.html')
+    print('Edge graph plot generation done')
+    ########################################################################
+    # convert it to dot file to be able to convert it to pdf or svg format for inserting into the paper
+    write_dot(g, output_name + args.data_name + "_relay_test_interactive.dot")
+    print('dot file generation done')
