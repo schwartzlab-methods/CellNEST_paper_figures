@@ -73,6 +73,45 @@ if __name__ == "__main__":
 
     ###############################  read which spots have self loops ###############################################################
     with gzip.open(args.selfloop_info_file, 'rb') as fp:  #b, a:[0:5]   _filtered
+        self_loop_found = pickle.load(fp)
+
+    ####### load annotations ##############################################
+    annotation_data = pd.read_csv(args.annotation_file_path, sep=",")
+    pathologist_label=[]
+    for i in range (0, len(annotation_data)):
+        pathologist_label.append([annotation_data['Barcode'][i], annotation_data['IX_annotation'][i]]) #ayah histology
+
+    barcode_type=dict() # record the type (annotation) of each spot (barcode)
+    for i in range (0, len(pathologist_label)):
+        barcode_type[pathologist_label[i][0]] = pathologist_label[i][1]
+
+    ######################### read the NEST output in csv format ####################################################
+
+    inFile = args.top_ccc_file
+    df = pd.read_csv(inFile, sep=",")
+
+    #################################################################################################################
+    csv_record = df.values.tolist() # barcode_info[i][0], barcode_info[j][0], ligand, receptor, edge_rank, label, i, j, score
+
+    ## sort the edges based on their rank (column 4), low to high, low being higher attention score
+    csv_record = sorted(csv_record, key = lambda x: x[4])
+    ## add the column names and take first top_edge_count edges
+    # columns are: from_cell, to_cell, ligand_gene, receptor_gene, rank, attention_score, component, from_id, to_id
+    df_column_names = list(df.columns)
+#    print(df_column_names)
+
+    print(len(csv_record))
+
+    if args.top_edge_count != -1:
+        csv_record_final = [df_column_names] + csv_record [0:min(args.top_edge_count, len(csv_record))]
+
+    ## add a dummy row at the end for the convenience of histogram preparation (to keep the color same as altair plot)
+    i=0
+    j=0
+    csv_record_final.append([barcode_info[i][0], barcode_info[j][0], 'no-ligand', 'no-receptor', 0, 0, i, j, 0]) # dummy for histogram
+
+    csv_record = 0
+    gc.collect()
 
     ######################## connected component finding #################################
     print('Finding connected component')
