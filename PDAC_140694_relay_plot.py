@@ -206,7 +206,7 @@ if __name__ == "__main__":
     pattern_distribution = defaultdict(list)
     # pattern_distribution['ligand-receptor to ligand-receptor']=[1,1,1,1, ...]
     edge_list_2hop = []
-    target_relay = "LGALS3-ITGB4 to TGFB1-ENG"
+    target_relay = 'LGALS3-ITGB4 to LGALS3-ITGB4' #"LGALS3-ITGB4 to TGFB1-ENG"
     for i in each_node_outgoing:
         for tupple in each_node_outgoing[i]: # first hop
             j = tupple[0]
@@ -275,10 +275,10 @@ if __name__ == "__main__":
     for i in range (0, len(barcode_info)):        
         marker_size = 'circle'
         label_str =  str(i)+'_c:'+str(barcode_info[i][3]) #  label of the node or spot is consists of: spot id, component number
-        if args.annotation_file_path != '':
-            label_str = label_str +'_'+ str(barcode_type[barcode_info[i][0]]) # also add the type of the spot to the label if annotation is available 
-            if str(barcode_type[barcode_info[i][0]]) == 'tumor': # Tumour
+        if args.annotation_file_path != '': 
+            if 'tumor' in str(barcode_type[barcode_info[i][0]]): # Tumour
                 marker_size = 'box'
+                label_str = label_str +'_'+ 'tumor' # also add the type of the spot to the label if annotation is available 
         
         g.add_node(int(ids[i]), x=int(x_index[i]), y=int(y_index[i]), label = label_str, pos = str(x_index[i])+","+str(-y_index[i])+" !", physics=False, shape = marker_size, color=matplotlib.colors.rgb2hex(colors_point[i]))    
 
@@ -296,7 +296,6 @@ if __name__ == "__main__":
         print(relay)
         for hop in range (0, len(relay)):
             k = relay[hop] # record id for the hops
-            
             i = csv_record_final[k][6]
             j = csv_record_final[k][7] 
             print('%d %d'%(i, j))
