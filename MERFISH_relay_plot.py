@@ -212,7 +212,7 @@ if __name__ == "__main__":
     pattern_distribution = defaultdict(list)
     # pattern_distribution['ligand-receptor to ligand-receptor']=[1,1,1,1, ...]
     edge_list_2hop = []
-    target_relay = 'APOE-SDC4 to APOE-SDC1' #'PSAP-LRP1 to APOE-LRP1' #'PSAP-LRP1 to PSAP-LRP1'
+    target_relay = 'PNOC-LPAR1 to BDNF-ESR1' #'PSAP-LRP1 to APOE-LRP1' #'PSAP-LRP1 to PSAP-LRP1'
     for i in each_node_outgoing:
         for tupple in each_node_outgoing[i]: # first hop
             j = tupple[0]
@@ -290,13 +290,14 @@ if __name__ == "__main__":
 
 
     # scale the edge scores [0 to 1] to make width in the plot work
+    '''
     score_list = []
     for k in range (1, len(csv_record_final)-1):
         score_list.append(csv_record_final[k][8])
 
     min_score = np.min(score_list)
     max_score = np.max(score_list)
-
+    '''
     count_edges = 0
     for relay in edge_list_2hop:
         print(relay)
@@ -307,10 +308,10 @@ if __name__ == "__main__":
             print('%d %d'%(i, j))
             ligand = csv_record_final[k][2]
             receptor = csv_record_final[k][3]            
-            edge_score = csv_record_final[k][8]
-            edge_score = (edge_score-min_score)/(max_score-min_score)   
-            title_str =  "L:" + ligand + ", R:" + receptor+ ", "+ str(edge_score) #+
-            g.add_edge(int(i), int(j), label = title_str, color=colors_point[i], value=np.float64(edge_score)) #
+            #edge_score = csv_record_final[k][8]
+            #edge_score = (edge_score-min_score)/(max_score-min_score)   
+            title_str =  "L:" + ligand + ", R:" + receptor#+ ", "+ str(edge_score) #+
+            g.add_edge(int(i), int(j), label = title_str, color=colors_point[i]) #, value=np.float64(edge_score)
             count_edges = count_edges + 1
 
     print("total edges plotted: %d"%count_edges)
