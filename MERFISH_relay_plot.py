@@ -244,17 +244,20 @@ if __name__ == "__main__":
     
     data_list=dict()
     data_list['X']=[]
-    data_list['Y']=[]   
-    for key in pattern_distribution:
-        for i in range (0, len(pattern_distribution[key])):
-            data_list['X'].append(key)
-            data_list['Y'].append(1)
-            
-    data_list_pd = pd.DataFrame(data_list)
-    chart= alt.Chart(data_list_pd).mark_bar().encode(
-                x=alt.X("X:N", axis=alt.Axis(labelAngle=45), sort='-y'),
-                y=alt.Y("count()"),
-            )
+    data_list['Y']=[] 
+    for i in range (0, 100): #len(two_hop_pattern_distribution)):
+        data_list['X'].append(two_hop_pattern_distribution[i][0])
+        data_list['Y'].append(two_hop_pattern_distribution[i][1])
+        
+    data_list_pd = pd.DataFrame({
+        'Relay Patterns': data_list['X'],
+        'Pattern Abundance (#)': data_list['Y']
+    })
+
+    chart = alt.Chart(data_list_pd).mark_bar().encode(
+        x=alt.X("Relay Patterns:N", axis=alt.Axis(labelAngle=45), sort='-y'),
+        y='Pattern Abundance (#)'
+    )
 
     chart.save(output_name + args.data_name +'_pattern_distribution.html')
 
