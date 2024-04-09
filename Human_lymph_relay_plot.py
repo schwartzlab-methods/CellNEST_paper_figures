@@ -56,7 +56,7 @@ def plot(df):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument( '--data_name', type=str, default='V1_Human_Lymph_Node_spatial', help='The name of dataset') # 
-    parser.add_argument( '--top_edge_count', type=int, default=400000, help='Number of the top communications to plot. To plot all insert -1') # 
+    parser.add_argument( '--top_edge_count', type=int, default=3000, help='Number of the top communications to plot. To plot all insert -1') # 
     parser.add_argument( '--barcode_info_file', type=str, default='NEST_figures_input/V1_Human_Lymph_Node_spatial_barcode_info', help='Path to load the barcode information file produced during data preprocessing step')
     parser.add_argument( '--annotation_file_path', type=str, default='NEST_figures_input/V1_Human_Lymph_Node_spatial_annotation.csv', help='Path to load the annotation file in csv format (if available) ') #_ayah_histology
     parser.add_argument( '--selfloop_info_file', type=str, default='NEST_figures_input/V1_Human_Lymph_Node_spatial_self_loop_record', help='Path to load the selfloop information file produced during data preprocessing step')
@@ -161,7 +161,7 @@ if __name__ == "__main__":
 
 
     ########################## filtering ###########
-    
+    '''
     ## change the csv_record_final here if you want histogram for specific components/regions only. e.g., if you want to plot only stroma region, or tumor-stroma regions etc.    ##
     #region_of_interest = [...] 
     csv_record_final_temp = []
@@ -181,7 +181,7 @@ if __name__ == "__main__":
     
     csv_record_final_temp.append(csv_record_final[len(csv_record_final)-1])
     csv_record_final = copy.deepcopy(csv_record_final_temp)
-    ''''''
+    '''
     #####################################
     component_list = dict()
     for record_idx in range (1, len(csv_record_final)-1): #last entry is a dummy for histograms, so ignore it.
@@ -244,18 +244,20 @@ if __name__ == "__main__":
     
     data_list=dict()
     data_list['X']=[]
-    data_list['Y']=[]   
-    for patterns in two_hop_pattern_distribution[0:20]:  #pattern_distribution:
-        key = patterns[0]
-        for i in range (0, len(pattern_distribution[key])):
-            data_list['X'].append(key)
-            data_list['Y'].append(1)
-            
-    data_list_pd = pd.DataFrame(data_list)
-    chart= alt.Chart(data_list_pd).mark_bar().encode(
-                x=alt.X("X:N", axis=alt.Axis(labelAngle=45), sort='-y'),
-                y=alt.Y("count()"),
-            )
+    data_list['Y']=[] 
+    for i in range (0, 100): #len(two_hop_pattern_distribution)):
+        data_list['X'].append(two_hop_pattern_distribution[i][0])
+        data_list['Y'].append(two_hop_pattern_distribution[i][1])
+        
+    data_list_pd = pd.DataFrame({
+        'Relay Patterns': data_list['X'],
+        'Pattern Abundance (#)': data_list['Y']
+    })
+
+    chart = alt.Chart(data_list_pd).mark_bar().encode(
+        x=alt.X("Relay Patterns:N", axis=alt.Axis(labelAngle=45), sort='-y'),
+        y='Pattern Abundance (#)'
+    )
 
     chart.save(output_name + args.data_name +'_pattern_distribution.html')
 
