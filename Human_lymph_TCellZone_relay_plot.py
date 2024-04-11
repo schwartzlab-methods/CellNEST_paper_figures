@@ -198,8 +198,7 @@ if __name__ == "__main__":
 
     ####################### pattern finding ##########################################################################
     # make a dictionary to keep record of all the outgoing edges [to_node, ligand, receptor] for each node
-    csv_record_final = sorted(csv_record_final, key = lambda x: x[4])
-  
+ 
     each_node_outgoing = defaultdict(list)
     for k in range (1, len(csv_record_final)-1): # last record is a dummy for histogram preparation
         i = csv_record_final[k][6]
