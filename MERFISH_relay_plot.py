@@ -212,7 +212,7 @@ if __name__ == "__main__":
     pattern_distribution = defaultdict(list)
     # pattern_distribution['ligand-receptor to ligand-receptor']=[1,1,1,1, ...]
     edge_list_2hop = []
-    target_relay = 'PNOC-LPAR1 to BDNF-ESR1' #'PSAP-LRP1 to APOE-LRP1' #'PSAP-LRP1 to PSAP-LRP1'
+    target_relay = 'PNOC-OPRD1 to PNOC-LPAR1' #'PSAP-LRP1 to APOE-LRP1' #'PSAP-LRP1 to PSAP-LRP1'
     for i in each_node_outgoing:
         for tupple in each_node_outgoing[i]: # first hop
             j = tupple[0]
@@ -272,7 +272,7 @@ if __name__ == "__main__":
     for i in range (0, len(barcode_info)):    
         ids.append(i)
         x_index.append(barcode_info[i][1])
-        y_index.append(barcode_info[i][2])    
+        y_index.append(-barcode_info[i][2])    
         colors_point.append(colors[barcode_info[i][3]]) 
     
     max_x = np.max(x_index)
