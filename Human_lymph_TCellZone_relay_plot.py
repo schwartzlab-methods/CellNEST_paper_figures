@@ -314,7 +314,7 @@ if __name__ == "__main__":
             edge_score = csv_record_final[k][8]
             edge_score = (edge_score-min_score)/(max_score-min_score)   
             title_str =  "L:" + ligand + ", R:" + receptor+ ", "+ str(edge_score) #+
-            g.add_edge(int(i), int(j), label = title_str, color=colors_point[i], value=np.float64(edge_score)) #
+            g.add_edge(int(i), int(j), label = title_str, color='#FF0000', value=np.float64(edge_score)) #colors_point[i]
             count_edges = count_edges + 1
 
     print("total edges plotted: %d"%count_edges)
