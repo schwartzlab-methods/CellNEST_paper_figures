@@ -25,11 +25,18 @@ import anndata
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument( '--data_path', type=str, default='data/V1_Human_Lymph_Node_spatial/' , help='The path to dataset') 
-parser.add_argument( '--data_name', type=str, default='V1_Human_Lymph_Node_spatial', help='The name of dataset')
+parser.add_argument( '--data_path', type=str, default='/cluster/projects/schwartzgroup/fatema/pancreatic_cancer_visium/210827_A00827_0396_BHJLJTDRXY_Notta_Karen/V10M25-61_D1_PDA_64630_Pa_P_Spatial10x_new/outs/' , help='The path to dataset') 
+parser.add_argument( '--data_name', type=str, default='PDAC_64630', help='The name of dataset')
 args = parser.parse_args()
 
- 
+parser = argparse.ArgumentParser()
+parser.add_argument( '--data_path', type=str, default='/cluster/projects/schwartzgroup/fatema/pancreatic_cancer_visium/exp1_C1/outs/' , help='The path to dataset') 
+parser.add_argument( '--data_name', type=str, default='PDAC_140694', help='The name of dataset')
+args = parser.parse_args()
+
+
+
+
 adata = st.Read10X(path=args.data_path, count_file='filtered_feature_bc_matrix.h5') 
 print(adata)
 
@@ -47,7 +54,7 @@ print('data read')
 adata = sc.read_h5ad(args.data_name+"_commot_adata.h5ad")
 
 
-ct.tl.communication_direction(adata, database_name='cellchat',  lr_pair=['CCL19','CCR7'],  k=5) #pathway_name='CCL',
+ct.tl.communication_direction(adata, database_name='cellchat',  lr_pair=['PLXNB2','MET'],  k=5) #pathway_name='CCL',
 print('Plot the CCC')
 ct.pl.plot_cell_communication(adata, database_name='cellchat', lr_pair=['CCL19','CCR7'], plot_method='grid', background_legend=True,
     scale=0.00003, ndsize=8, grid_density=0.4, summary='sender', background='image', clustering='leiden', cmap='Alphabet',
