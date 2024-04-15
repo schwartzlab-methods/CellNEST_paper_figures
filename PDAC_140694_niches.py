@@ -69,3 +69,7 @@ mark.ec$ratio <- mark.ec$pct.1/mark.ec$pct.2
 marker.list.ec <- mark.ec %>% group_by(cluster) %>% top_n(5,avg_log2FC)
 p <- DoHeatmap(ec.network,features = marker.list.ec$gene,cells = WhichCells(ec.network,downsample = 100))
 ggsave("/cluster/home/t116508uhn/64630/myplot.png", plot = p)
+
+
+
+
