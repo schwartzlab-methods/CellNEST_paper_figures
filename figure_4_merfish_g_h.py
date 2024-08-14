@@ -101,7 +101,20 @@ if __name__ == "__main__":
 
     #################################################################################################################
     csv_record = df.values.tolist() # barcode_info[i][0], barcode_info[j][0], ligand, receptor, edge_rank, label, i, j, score
+    '''
+    if args.z_axis!=-1:
+        index_filtered = []
+        for i in range (0, coordinates.shape[0]):
+            if coordinates[i][2]==args.z_axis:
+                index_filtered.append(i)
+        csv_record_temp = []
+        for record in range (0, len(csv_record)):
+            if (csv_record[record][6] in index_filtered) and (csv_record[record][7] in index_filtered):
+                csv_record_temp.append(csv_record[record])
+                
+        csv_record = csv_record_temp
 
+    '''
     ## sort the edges based on their rank (column 4), low to high, low being higher attention score
     csv_record = sorted(csv_record, key = lambda x: x[4])
     ## add the column names and take first top_edge_count edges
