@@ -105,7 +105,7 @@ if __name__ == "__main__":
         lr_pair_parent.append(csv_record[i][2]+'-'+csv_record[i][3])
 
     # save 
-    with gzip.open(output_name + args.data_name + 'lr_pair_parent', 'wb') as fp:  # at least one of lig or rec has exp > respective knee point          
+    with gzip.open(output_name +'lr_pair_parent19', 'wb') as fp:  # at least one of lig or rec has exp > respective knee point          
         pickle.dump(lr_pair_parent, fp)
 
 
