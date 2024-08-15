@@ -103,13 +103,37 @@ if __name__ == "__main__":
     for i in range (0, len(csv_record)): 
         lr_pair_virgin.append(csv_record[i][2]+'-'+csv_record[i][3])
 
-    lr_pair_virgin =set(lr_pair_virgin)
+    lr_pair_virgin =set(lr_pair_virgin) # 101
     
     # save 
     with gzip.open(output_name + args.data_name + 'lr_pair_parent', 'rb') as fp:  # at least one of lig or rec has exp > respective knee point          
         lr_pair_parent = pickle.load(fp)
 
-    lr_pair_parent = set(lr_pair_parent)
+    lr_pair_parent = set(lr_pair_parent) # 121
+    
+    common = lr_pair_virgin.intersection(lr_pair_parent) #99
+
+    # set_A.difference(set_B) for (A - B)
+
+    parent_exclusive = lr_pair_parent.difference(lr_pair_virgin) # 22
+
+    virgin_exclusive = lr_pair_virgin.difference(lr_pair_parent) # 2
+
+    csv_record_temp = []
+    for i in range(0, len(csv_record)):
+        if csv_record[i][2]+'-'+csv_record[i][3] in common:
+            csv_record_temp.append(csv_record[i])
+
+    csv_record = csv_record_temp
+
+    csv_record_temp = []
+    for i in range(0, len(csv_record)):
+        if csv_record[i][2]+'-'+csv_record[i][3] in virgin_exclusive:
+            csv_record_temp.append(csv_record[i])
+
+    csv_record = csv_record_temp
+
+    
     '''
 
   
