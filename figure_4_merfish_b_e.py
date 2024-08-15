@@ -98,16 +98,19 @@ if __name__ == "__main__":
 
     #################################################################################################################
     csv_record = df.values.tolist() # barcode_info[i][0], barcode_info[j][0], ligand, receptor, edge_rank, label, i, j, score
-'''
+    '''
     lr_pair_virgin = []
     for i in range (0, len(csv_record)): 
         lr_pair_virgin.append(csv_record[i][2]+'-'+csv_record[i][3])
 
+    lr_pair_virgin =set(lr_pair_virgin)
+    
     # save 
     with gzip.open(output_name + args.data_name + 'lr_pair_parent', 'rb') as fp:  # at least one of lig or rec has exp > respective knee point          
         lr_pair_parent = pickle.load(fp)
 
-'''
+    lr_pair_parent = set(lr_pair_parent)
+    '''
 
   
     ## sort the edges based on their rank (column 4), low to high, low being higher attention score
