@@ -99,7 +99,7 @@ if __name__ == "__main__":
     ## sort the edges based on their rank (column 4), low to high, low being higher attention score
     csv_record = sorted(csv_record, key = lambda x: x[4])
     ## add the column names and take first top_edge_count edges
-    # columns are: from_cell, to_cell, ligand_gene, receptor_gene, rank, attention_score, component, from_id, to_id
+    # columns are: from_cell, to_cell, ligand_gene, receptor_gene, rank, component, from_id, to_id, attention_score
     df_column_names = list(df.columns)
 #    print(df_column_names)
 
@@ -289,15 +289,15 @@ if __name__ == "__main__":
     if args.histogram_attention_score==1:
         lr_score = defaultdict(list)
         for i in range (1, len(csv_record_final)-1):    
-            lr_score[csv_record[i][2]+'-'+csv_record[i][3]].append(csv_record[i][5])
-        for key in lr_score.key():
+            lr_score[csv_record_final[i][2]+'-'+csv_record_final[i][3]].append(csv_record_final[i][8])
+        for key in lr_score.keys():
             lr_score[key]=np.sum(lr_score[key])
 
         # now plot the histograms where X axis will show the name or LR pair and Y axis will show the score.
         data_list=dict()
         data_list['X']=[]
         data_list['Y']=[] 
-        for key in lr_score.key(): #len(two_hop_pattern_distribution)):
+        for key in lr_score.keys(): #len(two_hop_pattern_distribution)):
             data_list['X'].append(key)
             data_list['Y'].append(lr_score[key])
             
@@ -312,8 +312,31 @@ if __name__ == "__main__":
         )
     
         chart.save(output_name + args.data_name +'_LRpair_score.html')
-    
-            
+        print('Saved at '+output_name + args.data_name +'_LRpair_score.html')
+ '''
+In [32]: lr_score
+Out[32]: 
+defaultdict(list,
+            {'CCL21-CXCR4': 4225.405765723297,
+             'CCL21-CCR7': 2949.097245159767,
+             'PCDH7-CXCR4': 0.3704821288748415,
+             'TGFB1-ENG': 4.080723634460016,
+             'CXCL14-CXCR4': 0.5531352038615932,
+             'TGFB1-TGFBR2': 26.625946890996737,
+             'HLA-DRA': 0.37394397965082715,
+             'CELSR1-HLA': 0.3759620404342901,
+             'NPB-CCR7': 0.0929142342989421,
+             'PTPRF-RACK1': 0.3762823146663877,
+             'NPW-CCR7': 0.0929572614024158,
+             'NPB-CXCR4': 0.371176383322931,
+             'RET-RACK1': 0.37628637558792494,
+             'NPW-CXCR4': 0.3713071203586996,
+             'HMGB1-AR': 0.2741797884119278,
+             'HMGB1-NTRK1': 0.27418142957807,
+             'HMGB1-TLR9': 0.2741830609056528,
+             'HMGB1-LY96': 0.2741846204268385,
+      
+ '''
     ################################ Density Curve #############################
     combined_score_distribution_ccl19_ccr7 = []
     combined_score_distribution = []
