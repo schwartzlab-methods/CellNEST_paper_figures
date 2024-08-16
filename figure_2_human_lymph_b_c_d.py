@@ -294,7 +294,7 @@ if __name__ == "__main__":
             lr_score[key]=np.sum(lr_score[key])
 
         # now plot the histograms where X axis will show the name or LR pair and Y axis will show the score.
-            
+             
     ################################ Density Curve #############################
     combined_score_distribution_ccl19_ccr7 = []
     combined_score_distribution = []
