@@ -294,15 +294,15 @@ if __name__ == "__main__":
     if args.histogram_attention_score==1:
         lr_score = defaultdict(list)
         for i in range (1, len(csv_record_final)-1):    
-            lr_score[csv_record[i][2]+'-'+csv_record[i][3]].append(csv_record[i][5])
-        for key in lr_score.key():
+            lr_score[csv_record_final[i][2]+'-'+csv_record_final[i][3]].append(csv_record_final[i][8])
+        for key in lr_score.keys():
             lr_score[key]=np.sum(lr_score[key])
 
         # now plot the histograms where X axis will show the name or LR pair and Y axis will show the score.
         data_list=dict()
         data_list['X']=[]
         data_list['Y']=[] 
-        for key in lr_score.key(): #len(two_hop_pattern_distribution)):
+        for key in lr_score.keys(): #len(two_hop_pattern_distribution)):
             data_list['X'].append(key)
             data_list['Y'].append(lr_score[key])
             
@@ -317,7 +317,7 @@ if __name__ == "__main__":
         )
     
         chart.save(output_name + args.data_name +'_LRpair_score.html')
-    
+        print('Saved at '+output_name + args.data_name +'_LRpair_score.html')    
     ############################  Network/edge graph plot ######################
 
     set1 = altairThemes.get_colour_scheme("Set1", unique_component_count)
