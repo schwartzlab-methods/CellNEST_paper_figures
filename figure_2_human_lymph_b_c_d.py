@@ -63,6 +63,7 @@ if __name__ == "__main__":
     parser.add_argument( '--top_ccc_file', type=str, default='NEST_figures_input_human_lymph/V1_Human_Lymph_Node_spatial_top20percent.csv', help='Path to load the selected top CCC file produced during data postprocessing step')
     parser.add_argument( '--input_edge_file', type=str, default='NEST_figures_input_human_lymph/V1_Human_Lymph_Node_spatial_input_graph.csv', help='Input edge list file name')
     parser.add_argument( '--output_name', type=str, default='NEST_figures_output/', help='Output file name prefix according to user\'s choice')
+    parser.add_argument( '--histogram_attention_score', type=int, default=-1, help='Set 1 to plot the histograms based on total attention scores of the ligand-receptor pairs')
     args = parser.parse_args()
 
 
@@ -284,6 +285,16 @@ if __name__ == "__main__":
     outPath = output_name + args.data_name + '_Tcell_histogram_test.html'
     p.save(outPath)	
     print('Histogram plot generation done')
+
+    if args.histogram_attention_score==1:
+        lr_score = defaultdict(list)
+        for i in range (1, len(csv_record_final)-1):    
+            lr_score[csv_record[i][2]+'-'+csv_record[i][3]].append(csv_record[i][5])
+        for key in lr_score.key():
+            lr_score[key]=np.sum(lr_score[key])
+
+        # now plot the histograms where X axis will show the name or LR pair and Y axis will show the score.
+            
     ################################ Density Curve #############################
     combined_score_distribution_ccl19_ccr7 = []
     combined_score_distribution = []
