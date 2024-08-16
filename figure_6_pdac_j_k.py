@@ -262,7 +262,33 @@ if __name__ == "__main__":
     outPath = output_name + args.data_name + '_histogram_test.html'
     p.save(outPath)	
     print('Histogram plot generation done')
+    if args.histogram_attention_score==1:
+        lr_score = defaultdict(list)
+        for i in range (1, len(csv_record_final)-1):    
+            lr_score[csv_record_final[i][2]+'-'+csv_record_final[i][3]].append(csv_record_final[i][8])
+        for key in lr_score.keys():
+            lr_score[key]=np.sum(lr_score[key])
 
+        # now plot the histograms where X axis will show the name or LR pair and Y axis will show the score.
+        data_list=dict()
+        data_list['X']=[]
+        data_list['Y']=[] 
+        for key in lr_score.keys(): #len(two_hop_pattern_distribution)):
+            data_list['X'].append(key)
+            data_list['Y'].append(lr_score[key])
+            
+        data_list_pd = pd.DataFrame({
+            'Ligand-Receptor Pairs': data_list['X'],
+            'Total Attention Score': data_list['Y']
+        })
+    
+        chart = alt.Chart(data_list_pd).mark_bar().encode(
+            x=alt.X("Ligand-Receptor Pairs:N", axis=alt.Axis(labelAngle=45), sort='-y'),
+            y='Total Attention Score'
+        )
+    
+        chart.save(output_name + args.data_name +'_LRpair_score.html')
+        print('Saved at '+output_name + args.data_name +'_LRpair_score.html')    
     ############################  Network/edge graph plot ######################
 
     set1 = altairThemes.get_colour_scheme("Set1", unique_component_count)
