@@ -1,0 +1,7 @@
+files:
+  nest_database: "./data/nest_database.cv"
+  
+directories:
+  lymph_node_visium: "./data/lymph_node_visium"
+  synthetic: 
+    uniform_distribution: ".data/synthetic/type_uniform_distribution" 
