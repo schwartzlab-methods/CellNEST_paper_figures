@@ -62,7 +62,6 @@ if __name__ == "__main__":
     parser.add_argument( '--selfloop_info_file', type=str, default='NEST_figures_input_MERFISH_plot/Female_Naive_id1_self_loop_record', help='Path to load the selfloop information file produced during data preprocessing step')
     parser.add_argument( '--top_ccc_file', type=str, default='NEST_figures_input_MERFISH_plot/Female_Naive_id1_top20percent.csv', help='Path to load the selected top CCC file produced during data postprocessing step')
     parser.add_argument( '--coordinate_file', type=str, default='NEST_figures_input_MERFISH_plot/Female_Naive_id1_coordinates', help='Path to load the coordinates')
-  
     parser.add_argument( '--output_name', type=str, default='NEST_figures_output/', help='Output file name prefix according to user\'s choice')
     args = parser.parse_args()
 
@@ -102,7 +101,7 @@ if __name__ == "__main__":
     #################################################################################################################
     csv_record = df.values.tolist() # barcode_info[i][0], barcode_info[j][0], ligand, receptor, edge_rank, label, i, j, score
     '''
-    if args.z_axis!=-1:
+    if args.z_axis!=-1: # if we want to plot CCC within just one slide provided by the user 
         index_filtered = []
         for i in range (0, coordinates.shape[0]):
             if coordinates[i][2]==args.z_axis:
@@ -119,7 +118,19 @@ if __name__ == "__main__":
     csv_record = sorted(csv_record, key = lambda x: x[4])
     ## add the column names and take first top_edge_count edges
     # columns are: from_cell, to_cell, ligand_gene, receptor_gene, rank, attention_score, component, from_id, to_id
+    '''
     df_column_names = list(df.columns)
+    df_column_names.append('z_axis_from')
+    df_column_names.append('z_axis_to')
+    
+    for index in range (0, len(csv_record)):
+        i = csv_record[index][6] # from
+        j = csv_record[index][7] # to       
+        csv_record[index].append(coordinates[i][2]) # from         
+        csv_record[index].append(coordinates[j][2]) # to
+
+    
+    '''
 #    print(df_column_names)
 
     print(len(csv_record))
@@ -127,6 +138,11 @@ if __name__ == "__main__":
     if args.top_edge_count != -1:
         csv_record_final = [df_column_names] + csv_record [0:min(args.top_edge_count, len(csv_record))]
 
+    ###################
+    '''
+    df = pd.DataFrame(csv_record_final)
+    df.to_csv(args.data_name+'_top10k_z_axis.csv', index=False, header=False)
+    '''
     ## add a dummy row at the end for the convenience of histogram preparation (to keep the color same as altair plot)
     i=0
     j=0
