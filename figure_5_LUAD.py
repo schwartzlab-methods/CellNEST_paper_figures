@@ -160,7 +160,9 @@ if __name__ == "__main__":
         label = barcode_info[i][3]
         csv_record_final[record][5] = label
 
-
+    
+    df = pd.DataFrame(csv_record_final)
+    df.to_csv(output_name + args.data_name + '_ccc_list_top'+ str(args.top_edge_count) +'.csv', index=False, header=False)
     ########################## filtering ###########
     '''
     ## change the csv_record_final here if you want histogram for specific components/regions only. e.g., if you want to plot only stroma region, or tumor-stroma regions etc.    ##
