@@ -1,0 +1,14 @@
+benchmarks/data/
+benchmarks/refs/
+benchmarks/raw_result/
+benchmarks/filtered_result/
+benchmarks/result/
+benchmarks/archive/
+benchmarks/pypath_log/
+benchmarks/logs/
+result/
+derivations/
+__pycache__/
+*.log
+*.out
+
