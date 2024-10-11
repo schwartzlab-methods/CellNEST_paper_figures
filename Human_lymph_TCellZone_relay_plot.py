@@ -108,8 +108,8 @@ if __name__ == "__main__":
 
     print(len(csv_record))
 
-    if args.top_edge_count != -1:
-        csv_record_final = [df_column_names] + csv_record [0:min(args.top_edge_count, len(csv_record))]
+    
+	csv_record_final = [df_column_names] + csv_record #[0:min(args.top_edge_count, len(csv_record))]
 
     ## add a dummy row at the end for the convenience of histogram preparation (to keep the color same as altair plot)
     i=0
@@ -196,7 +196,17 @@ if __name__ == "__main__":
     component_list[0] = ''
     unique_component_count = max(len(component_list.keys()), id_label)
 
-    ####################### pattern finding ##########################################################################
+    ####################### keep top 5000 ###########################################################################
+'''
+    ## sort the edges based on their rank (column 4), low to high, low being higher attention score
+    csv_record_temp = csv_record_final[1:len(csv_record_final)-1]
+    csv_record_temp = sorted(csv_record_temp, key = lambda x: x[4])
+
+    csv_record_temp = csv_record_temp[0:5000] + [csv_record_final[len(csv_record_final)-1]]
+    csv_record_temp = [csv_record_final[0]] + csv_record_temp  
+    csv_record_final = csv_record_temp 
+    '''
+####################### pattern finding ##########################################################################
     # make a dictionary to keep record of all the outgoing edges [to_node, ligand, receptor] for each node
  
     each_node_outgoing = defaultdict(list)
