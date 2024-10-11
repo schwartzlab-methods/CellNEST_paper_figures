@@ -152,8 +152,12 @@ if __name__ == "__main__":
         i = csv_record_final[record][6]
         label = barcode_info[i][3]
         csv_record_final[record][5] = label
-
-
+      
+  #################################### save it
+    df = pd.DataFrame(csv_record_final[0:len(csv_record_final)])
+    df.to_csv(output_name + args.data_name + '_ccc_list_top'+ str(args.top_edge_count) +'.csv', index=False, header=False)
+  
+#####################################################################################3
 
     component_list = dict()
     for record_idx in range (1, len(csv_record_final)-1): #last entry is a dummy for histograms, so ignore it.
