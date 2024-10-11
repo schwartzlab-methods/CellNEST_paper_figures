@@ -251,7 +251,21 @@ if __name__ == "__main__":
             )
 
     chart.save(output_name + args.data_name +'_pattern_distribution.html')
+  ######################################################
+    data_list_pd.to_csv(output_name + args.data_name +'_top20p_topEdge'+str(args.top_edge_count)+'_relay_count.csv', index=False)
+  
+    with gzip.open(output_name + args.data_name + 'top20p_topEdge'+str(args.top_edge_count)+'_pattern_distribution_cell_info', 'wb') as fp: 
+	    pickle.dump(pattern_distribution_cell_info, fp)
 
+    with gzip.open(output_name + args.data_name + 'top20p_topEdge'+str(args.top_edge_count)+'_pattern_distribution_cell_info', 'rb') as fp:  
+	    pattern_distribution_cell_info = pickle.load(fp)
+
+    pattern_list = list(pattern_distribution_cell_info.keys()) 
+    # see which cells are forming the first pattern
+    group_list = pattern_distribution_cell_info[pattern_list[0]]
+    for group_id in range(0, len(group_list)):
+        print('group: %d'%group_id)
+        print(group_list[group_id])
     ######################### Plotting the two hops #####################
     set1 = altairThemes.get_colour_scheme("Set1", unique_component_count)
     colors = set1
