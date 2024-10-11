@@ -161,8 +161,6 @@ if __name__ == "__main__":
         csv_record_final[record][5] = label
 
     
-    df = pd.DataFrame(csv_record_final)
-    df.to_csv(output_name + args.data_name + '_ccc_list_top'+ str(args.top_edge_count) +'.csv', index=False, header=False)
     ########################## filtering ###########
     '''
     ## change the csv_record_final here if you want histogram for specific components/regions only. e.g., if you want to plot only stroma region, or tumor-stroma regions etc.    ##
@@ -185,6 +183,10 @@ if __name__ == "__main__":
     csv_record_final_temp.append(csv_record_final[len(csv_record_final)-1])
     csv_record_final = copy.deepcopy(csv_record_final_temp)
     '''
+    #################################### save it
+    df = pd.DataFrame(csv_record_final[0:len(csv_record_final)])
+    df.to_csv(output_name + args.data_name + '_ccc_list_top'+ str(args.top_edge_count) +'.csv', index=False, header=False)
+  
     #####################################
     component_list = dict()
     for record_idx in range (1, len(csv_record_final)-1): #last entry is a dummy for histograms, so ignore it.
@@ -293,6 +295,38 @@ if __name__ == "__main__":
     outPath = output_name + args.data_name + '_histogram_test.html'
     p.save(outPath)	
     print('Histogram plot generation done')
+    ################################# Save the histograms in a table format ########################################
+
+    hist_count = defaultdict(list)
+    for i in range (1, len(csv_record_final)-1):    
+        hist_count[csv_record_final[i][2]+'-'+csv_record_final[i][3]].append(1)
+
+    lr_pair_count = []
+    for lr_pair in hist_count.keys():
+        hist_count[lr_pair] = np.sum(hist_count[lr_pair])
+        lr_pair_count.append([lr_pair, hist_count[lr_pair]])
+
+    # sort it in high to low order
+    lr_pair_count = sorted(lr_pair_count, key = lambda x: x[1], reverse=True)
+  
+    # now plot the histograms where X axis will show the name or LR pair and Y axis will show the score.
+    data_list=dict()
+    data_list['X']=[]
+    data_list['Y']=[] 
+    for i in range (0, len(lr_pair_count)):
+        data_list['X'].append(lr_pair_count[i][0])
+        data_list['Y'].append(lr_pair_count[i][1])
+        
+    data_list_pd = pd.DataFrame({
+        'Ligand-Receptor Pairs': data_list['X'],
+        'Total Count': data_list['Y']
+    })
+  
+    data_list_pd.to_csv(output_name + args.data_name +'_LRpair_count_table.csv', index=False)
+    print(output_name + args.data_name +'_LRpair_count_table.csv')    
+
+  
+    ###############################################################################################################  
     if args.histogram_attention_score==1:
         lr_score = defaultdict(list)
         for i in range (1, len(csv_record_final)-1):    
