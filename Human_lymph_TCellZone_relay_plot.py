@@ -232,19 +232,8 @@ if __name__ == "__main__":
                     relay = lig_rec_1 + ' to ' + lig_rec_2
                     if relay == target_relay:
                         edge_list_2hop.append([record_id_1,record_id_2])
-    
-    with gzip.open(output_name + args.data_name + '_TcellZone' +'_pattern_distribution_cell_info', 'wb') as fp:  #b, a:[0:5]   _filtered
-	    pickle.dump(pattern_distribution_cell_info, fp)
 
-    with gzip.open(output_name + args.data_name + '_TcellZone' +'_pattern_distribution_cell_info', 'rb') as fp:  #b, a:[0:5]   _filtered
-	    pattern_distribution_cell_info = pickle.load(fp)
-
-    pattern_list = list(pattern_distribution_cell_info.keys())
-    for pattern in pattern_list:
-        print('%s has following cells')
-        print(pattern_distribution_cell_info[pattern])
-
-  
+	
     two_hop_pattern_distribution = []
     same_count = 0
     for key in pattern_distribution:
@@ -267,14 +256,27 @@ if __name__ == "__main__":
         'Pattern Abundance (#)': data_list['Y']
     })
   
-    data_list_pd.to_csv(output_name + args.data_name +'_top20p_Tcell_relay_count.csv', index=False)
-  
     chart = alt.Chart(data_list_pd).mark_bar().encode(
         x=alt.X("Relay Patterns:N", axis=alt.Axis(labelAngle=45), sort='-y'),
         y='Pattern Abundance (#)'
     )
 
     chart.save(output_name + args.data_name + '_TcellZone' +'_pattern_distribution.html')
+    ######################### save as table format and numpy format ########
+    data_list_pd.to_csv(output_name + args.data_name +'_top20p_Tcell_topEdge'+str(args.top_edge_count)+'_relay_count.csv', index=False)
+  
+    with gzip.open(output_name + args.data_name + 'top20p_Tcell_topEdge'+str(args.top_edge_count)+'_pattern_distribution_cell_info', 'wb') as fp: 
+	    pickle.dump(pattern_distribution_cell_info, fp)
+
+    with gzip.open(output_name + args.data_name + 'top20p_Tcell_topEdge'+str(args.top_edge_count)+'_pattern_distribution_cell_info', 'rb') as fp:  
+	    pattern_distribution_cell_info = pickle.load(fp)
+
+    pattern_list = list(pattern_distribution_cell_info.keys()) 
+    # see which cells are forming the first pattern
+    group_list = pattern_distribution_cell_info[pattern_list[0]]
+    for group_id in range(0, len(group_list)):
+        print('group: %d'%group_id)
+        print(group_list[group_id])
 
     ######################### Plotting the two hops #####################
     set1 = altairThemes.get_colour_scheme("Set1", unique_component_count)
