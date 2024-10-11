@@ -204,6 +204,7 @@ if __name__ == "__main__":
     
     # all possible 2-hop pattern count
     pattern_distribution = defaultdict(list)
+	pattern_distribution_cell_info = defaultdict(list)
     # pattern_distribution['ligand-receptor to ligand-receptor']=[1,1,1,1, ...]
     edge_list_2hop = []
     target_relay = 'FN1-RPSA to FN1-RPSA'
@@ -220,6 +221,7 @@ if __name__ == "__main__":
                     lig_rec_2 = tupple_next[1]+'-'+tupple_next[2]
                     record_id_2 = tupple_next[3]
                     pattern_distribution[lig_rec_1 + ' to ' + lig_rec_2].append(1)
+                    pattern_distribution_cell_info[lig_rec_1 + ' to ' + lig_rec_2].append([barcode_info[i], barcode_info[j], barcode_info[k]]) # a_id, b_id, c_id
                     relay = lig_rec_1 + ' to ' + lig_rec_2
                     if relay == target_relay:
                         edge_list_2hop.append([record_id_1,record_id_2])
@@ -235,23 +237,26 @@ if __name__ == "__main__":
         #    same_count = same_count + 1
     
     two_hop_pattern_distribution = sorted(two_hop_pattern_distribution, key = lambda x: x[1], reverse=True) # high to low
-    
+
     data_list=dict()
     data_list['X']=[]
-    data_list['Y']=[]   
-    for key in pattern_distribution:
-        for i in range (0, len(pattern_distribution[key])):
-            data_list['X'].append(key)
-            data_list['Y'].append(1)
-            
-    data_list_pd = pd.DataFrame(data_list)
-    chart= alt.Chart(data_list_pd).mark_bar().encode(
-                x=alt.X("X:N", axis=alt.Axis(labelAngle=45), sort='-y'),
-                y=alt.Y("count()"),
-            )
+    data_list['Y']=[] 
+    for i in range (0, 100): #len(two_hop_pattern_distribution)):
+        data_list['X'].append(two_hop_pattern_distribution[i][0])
+        data_list['Y'].append(two_hop_pattern_distribution[i][1])
+        
+    data_list_pd = pd.DataFrame({
+        'Relay Patterns': data_list['X'],
+        'Pattern Abundance (#)': data_list['Y']
+    })
 
+    chart = alt.Chart(data_list_pd).mark_bar().encode(
+        x=alt.X("Relay Patterns:N", axis=alt.Axis(labelAngle=45), sort='-y'),
+        y='Pattern Abundance (#)'
+    )
     chart.save(output_name + args.data_name +'_pattern_distribution.html')
-
+	
+	
 ##########################################################################
     data_list_pd.to_csv(output_name + args.data_name +'_top20p_topEdge'+str(args.top_edge_count)+'_relay_count.csv', index=False)
   
