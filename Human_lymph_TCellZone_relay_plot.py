@@ -211,6 +211,7 @@ if __name__ == "__main__":
     
     # all possible 2-hop pattern count
     pattern_distribution = defaultdict(list)
+    pattern_distribution_cell_info = defaultdict(list)
     # pattern_distribution['ligand-receptor to ligand-receptor']=[1,1,1,1, ...]
     edge_list_2hop = []
     target_relay = 'CCL19-CCR7 to CCL21-CXCR4'
@@ -227,12 +228,23 @@ if __name__ == "__main__":
                     lig_rec_2 = tupple_next[1]+'-'+tupple_next[2]
                     record_id_2 = tupple_next[3]
                     pattern_distribution[lig_rec_1 + ' to ' + lig_rec_2].append(1)
+                    pattern_distribution_cell_info[lig_rec_1 + ' to ' + lig_rec_2].append([barcode_info[i], barcode_info[j], barcode_info[k]]) # a_id, b_id, c_id 
                     relay = lig_rec_1 + ' to ' + lig_rec_2
                     if relay == target_relay:
                         edge_list_2hop.append([record_id_1,record_id_2])
     
-    
+    with gzip.open(output_name + args.data_name + '_TcellZone' +'_pattern_distribution_cell_info', 'wb') as fp:  #b, a:[0:5]   _filtered
+	    pickle.dump(pattern_distribution_cell_info, fp)
 
+    with gzip.open(output_name + args.data_name + '_TcellZone' +'_pattern_distribution_cell_info', 'rb') as fp:  #b, a:[0:5]   _filtered
+	    pattern_distribution_cell_info = pickle.load(fp)
+
+    pattern_list = list(pattern_distribution_cell_info.keys())
+    for pattern in pattern_list:
+        print('%s has following cells')
+        print(pattern_distribution_cell_info[pattern])
+
+  
     two_hop_pattern_distribution = []
     same_count = 0
     for key in pattern_distribution:
@@ -254,7 +266,9 @@ if __name__ == "__main__":
         'Relay Patterns': data_list['X'],
         'Pattern Abundance (#)': data_list['Y']
     })
-
+  
+    data_list_pd.to_csv(output_name + args.data_name +'_top20p_Tcell_relay_count.csv', index=False)
+  
     chart = alt.Chart(data_list_pd).mark_bar().encode(
         x=alt.X("Relay Patterns:N", axis=alt.Axis(labelAngle=45), sort='-y'),
         y='Pattern Abundance (#)'
