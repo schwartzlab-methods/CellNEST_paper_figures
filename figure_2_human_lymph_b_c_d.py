@@ -177,6 +177,12 @@ if __name__ == "__main__":
     
     csv_record_final_temp.append(csv_record_final[len(csv_record_final)-1])
     csv_record_final = copy.deepcopy(csv_record_final_temp)
+
+    #################################### save it
+    df = pd.DataFrame(csv_record_final[0:len(csv_record_final)])
+    df.to_csv(output_name + args.data_name + '_ccc_list_top20p_TCell.csv', index=False, header=False)
+  
+  
     ###################################################  
     component_list = dict()
     for record_idx in range (1, len(csv_record_final)-1): #last entry is a dummy for histograms, so ignore it.
@@ -272,9 +278,6 @@ if __name__ == "__main__":
     chart.save(output_name + args.data_name +'_Tcell_altair_plot.html')
     print('Altair plot generation done')
 
-    ##################### save the top_edge_count in csv #############
-    df = pd.DataFrame(csv_record_final[0:len(csv_record_final)-1])
-    df.to_csv(output_name + args.data_name +'_top20p_Tcell.html', index=False, header=False)
     ###################################  Histogram plotting #################################################################################
     
     df = pd.DataFrame(csv_record_final)
