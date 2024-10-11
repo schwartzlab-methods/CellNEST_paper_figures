@@ -272,8 +272,11 @@ if __name__ == "__main__":
     chart.save(output_name + args.data_name +'_Tcell_altair_plot.html')
     print('Altair plot generation done')
 
+    ##################### save the top_edge_count in csv #############
+    df = pd.DataFrame(csv_record_final[0:len(csv_record_final)-1])
+    df.to_csv(output_name + args.data_name +'_top20p_Tcell.html', index=False, header=False)
     ###################################  Histogram plotting #################################################################################
-
+    
     df = pd.DataFrame(csv_record_final)
     df.to_csv('temp_csv.csv', index=False, header=False)
     df = pd.read_csv('temp_csv.csv', sep=",")
