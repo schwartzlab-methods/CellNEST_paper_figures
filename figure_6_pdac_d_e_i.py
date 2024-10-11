@@ -176,6 +176,10 @@ if __name__ == "__main__":
     csv_record_final_temp.append(csv_record_final[len(csv_record_final)-1])
     csv_record_final = copy.deepcopy(csv_record_final_temp)
     '''
+    #################################### save it
+    df = pd.DataFrame(csv_record_final[0:len(csv_record_final)])
+    df.to_csv(output_name + args.data_name + '_ccc_list_top'+ str(args.top_edge_count) +'.csv', index=False, header=False)
+  
     #####################################
     component_list = dict()
     for record_idx in range (1, len(csv_record_final)-1): #last entry is a dummy for histograms, so ignore it.
@@ -191,58 +195,7 @@ if __name__ == "__main__":
     unique_component_count = max(len(component_list.keys()), id_label)
 
     ####################### pattern finding ##########################################################################
-    # make a dictionary to keep record of all the outgoing edges [to_node, ligand, receptor] for each node
-    each_node_outgoing = defaultdict(list)
-    for k in range (1, len(csv_record_final)-1): # last record is a dummy for histogram preparation
-        i = csv_record_final[k][6]
-        j = csv_record_final[k][7]
-        if i == j:
-            continue        
-        ligand = csv_record_final[k][2]
-        receptor = csv_record_final[k][3]
-        each_node_outgoing[i].append([j, ligand, receptor])
-    
-    # all possible 2 hop pattern count
-    pattern_distribution = defaultdict(list)
-    # pattern_distribution['ligand-receptor to ligand-receptor']=[1,1,1,1, ...]
-    for i in each_node_outgoing:
-        for tupple in each_node_outgoing[i]: # first hop
-            j = tupple[0]
-            lig_rec_1 = tupple[1]+'-'+tupple[2]
-            if j in each_node_outgoing:
-                for tupple_next in each_node_outgoing[j]: # second hop
-                    k = tupple_next[0]
-                    if k == i or k == j:
-                        continue
-                    lig_rec_2 = tupple_next[1]+'-'+tupple_next[2]
-                    pattern_distribution[lig_rec_1 + ' to ' + lig_rec_2].append(1)
-    
-
-    two_hop_pattern_distribution = []
-    same_count = 0
-    for key in pattern_distribution:
-        count = len(pattern_distribution[key])
-        two_hop_pattern_distribution.append([key, count]) 
-        #if lig_rec_1 == lig_rec_2:
-        #    same_count = same_count + 1
-    
-    two_hop_pattern_distribution = sorted(two_hop_pattern_distribution, key = lambda x: x[1], reverse=True) 
-    
-    data_list=dict()
-    data_list['X']=[]
-    data_list['Y']=[]   
-    for key in pattern_distribution:
-        for i in range (0, len(pattern_distribution[key])):
-            data_list['X'].append(key)
-            data_list['Y'].append(1)
-            
-    data_list_pd = pd.DataFrame(data_list)
-    chart= alt.Chart(data_list_pd).mark_bar().encode(
-                x=alt.X("X:N", axis=alt.Axis(labelAngle=45), sort='-y'),
-                y=alt.Y("count()"),
-            )
-
-    chart.save(output_name + args.data_name +'_pattern_distribution.html')
+    # see the relay plot figure
 
     ##################################### Altair Plot ##################################################################
     ## dictionary of those spots who are participating in CCC ##
