@@ -211,6 +211,7 @@ if __name__ == "__main__":
     # all possible 2-hop pattern count
     pattern_distribution = defaultdict(list)
     # pattern_distribution['ligand-receptor to ligand-receptor']=[1,1,1,1, ...]
+    pattern_distribution_cell_info = defaultdict(list)
     edge_list_2hop = []
     target_relay = 'PNOC-OPRD1 to PNOC-LPAR1' #'PSAP-LRP1 to APOE-LRP1' #'PSAP-LRP1 to PSAP-LRP1'
     for i in each_node_outgoing:
@@ -226,6 +227,7 @@ if __name__ == "__main__":
                     lig_rec_2 = tupple_next[1]+'-'+tupple_next[2]
                     record_id_2 = tupple_next[3]
                     pattern_distribution[lig_rec_1 + ' to ' + lig_rec_2].append(1)
+                    pattern_distribution_cell_info[lig_rec_1 + ' to ' + lig_rec_2].append([barcode_info[i], barcode_info[j], barcode_info[k]]) # a_id, b_id, c_id
                     relay = lig_rec_1 + ' to ' + lig_rec_2
                     if relay == target_relay:
                         edge_list_2hop.append([record_id_1,record_id_2])
@@ -260,7 +262,15 @@ if __name__ == "__main__":
     )
 
     chart.save(output_name + args.data_name +'_pattern_distribution.html')
+    ######################### save as table format and numpy format ########
+    data_list_pd.to_csv(output_name + args.data_name +'_top20p_topEdge'+str(args.top_edge_count)+'_relay_count.csv', index=False)
+  
+    with gzip.open(output_name + args.data_name + 'top20p_topEdge'+str(args.top_edge_count)+'_pattern_distribution_cell_info', 'wb') as fp: 
+	    pickle.dump(pattern_distribution_cell_info, fp)
 
+    with gzip.open(output_name + args.data_name + 'top20p_topEdge'+str(args.top_edge_count)+'_pattern_distribution_cell_info', 'rb') as fp:  
+	    pattern_distribution_cell_info = pickle.load(fp)
+        
     ######################### Plotting the two hops #####################
     set1 = altairThemes.get_colour_scheme("Set1", unique_component_count)
     colors = set1
