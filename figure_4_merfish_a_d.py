@@ -171,7 +171,10 @@ if __name__ == "__main__":
         i = csv_record_final[record][6]
         label = barcode_info[i][3]
         csv_record_final[record][5] = label
-
+    #################################### save it
+    df = pd.DataFrame(csv_record_final[0:len(csv_record_final)])
+    df.to_csv(output_name + args.data_name + '_ccc_list_top'+ str(args.top_edge_count) +'.csv', index=False, header=False)
+  
     #####################################
     component_list = dict()
     for record_idx in range (1, len(csv_record_final)-1): #last entry is a dummy for histograms, so ignore it.
@@ -281,6 +284,63 @@ if __name__ == "__main__":
     p.save(outPath)	
     print('Histogram plot generation done')
 
+    hist_count = defaultdict(list)
+    for i in range (1, len(csv_record_final)-1):    
+        hist_count[csv_record_final[i][2]+'-'+csv_record_final[i][3]].append(1)
+
+    lr_pair_count = []
+    for lr_pair in hist_count.keys():
+        hist_count[lr_pair] = np.sum(hist_count[lr_pair])
+        lr_pair_count.append([lr_pair, hist_count[lr_pair]])
+
+    # sort it in high to low order
+    lr_pair_count = sorted(lr_pair_count, key = lambda x: x[1], reverse=True)
+  
+    # now plot the histograms where X axis will show the name or LR pair and Y axis will show the score.
+    data_list=dict()
+    data_list['X']=[]
+    data_list['Y']=[] 
+    for i in range (0, len(lr_pair_count)):
+        data_list['X'].append(lr_pair_count[i][0])
+        data_list['Y'].append(lr_pair_count[i][1])
+        
+    data_list_pd = pd.DataFrame({
+        'Ligand-Receptor Pairs': data_list['X'],
+        'Total Count': data_list['Y']
+    })
+  
+    data_list_pd.to_csv(output_name + args.data_name +'_LRpair_count_table.csv', index=False)
+    print(output_name + args.data_name +'_LRpair_count_table.csv')    
+
+  
+    ###############################################################################################################  
+    if args.histogram_attention_score==1:
+        lr_score = defaultdict(list)
+        for i in range (1, len(csv_record_final)-1):    
+            lr_score[csv_record_final[i][2]+'-'+csv_record_final[i][3]].append(csv_record_final[i][8])
+        for key in lr_score.keys():
+            lr_score[key]=np.sum(lr_score[key])
+
+        # now plot the histograms where X axis will show the name or LR pair and Y axis will show the score.
+        data_list=dict()
+        data_list['X']=[]
+        data_list['Y']=[] 
+        for key in lr_score.keys(): #len(two_hop_pattern_distribution)):
+            data_list['X'].append(key)
+            data_list['Y'].append(lr_score[key])
+            
+        data_list_pd = pd.DataFrame({
+            'Ligand-Receptor Pairs': data_list['X'],
+            'Total Attention Score': data_list['Y']
+        })
+    
+        chart = alt.Chart(data_list_pd).mark_bar().encode(
+            x=alt.X("Ligand-Receptor Pairs:N", axis=alt.Axis(labelAngle=45), sort='-y'),
+            y='Total Attention Score'
+        )
+    
+        chart.save(output_name + args.data_name +'_LRpair_score.html')
+        print('Saved at '+output_name + args.data_name +'_LRpair_score.html')    
     ############################  Network/edge graph plot ######################
 
     set1 = altairThemes.get_colour_scheme("Set1", unique_component_count)
