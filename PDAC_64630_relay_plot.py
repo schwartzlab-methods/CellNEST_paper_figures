@@ -204,7 +204,7 @@ if __name__ == "__main__":
     
     # all possible 2-hop pattern count
     pattern_distribution = defaultdict(list)
-	pattern_distribution_cell_info = defaultdict(list)
+    pattern_distribution_cell_info = defaultdict(list)
     # pattern_distribution['ligand-receptor to ligand-receptor']=[1,1,1,1, ...]
     edge_list_2hop = []
     target_relay = 'FN1-RPSA to FN1-RPSA'
