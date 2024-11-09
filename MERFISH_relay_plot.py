@@ -57,12 +57,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument( '--data_name', type=str, default='Female_Parenting_Excitatory_id19_bregma0.11', help='The name of dataset') # 
     parser.add_argument( '--top_edge_count', type=int, default=1000, help='Number of the top communications to plot. To plot all insert -1') # 
-    parser.add_argument( '--relay_score', type=int, default=1, help='Relay count or score? ) #
-    parser.add_argument( '--barcode_info_file', type=str, default='NEST_figures_input/Female_Parenting_Excitatory_id19_bregma0.11_barcode_info', help='Path to load the barcode information file produced during data preprocessing step')
+    parser.add_argument( '--relay_score', type=int, default=1, help='Relay count or score? ') #
+    parser.add_argument( '--barcode_info_file', type=str, default='NEST_figures_input_MERFISH_plot/Female_Parenting_Excitatory_id19_bregma0.11_barcode_info', help='Path to load the barcode information file produced during data preprocessing step')
     parser.add_argument( '--annotation_file_path', type=str, default='', help='Path to load the annotation file in csv format (if available) ') #_ayah_histology
-    parser.add_argument( '--selfloop_info_file', type=str, default='NEST_figures_input/Female_Parenting_Excitatory_id19_bregma0.11_self_loop_record', help='Path to load the selfloop information file produced during data preprocessing step')
-    parser.add_argument( '--top_ccc_file', type=str, default='NEST_figures_input/Female_Parenting_Excitatory_id19_bregma0.11_top20percent.csv', help='Path to load the selected top CCC file produced during data postprocessing step')
-    parser.add_argument( '--output_name', type=str, default='NEST_figures_output/', help='Output file name prefix according to user\'s choice')
+    parser.add_argument( '--selfloop_info_file', type=str, default='NEST_figures_input_MERFISH_plot/Female_Parenting_Excitatory_id19_bregma0.11_self_loop_record', help='Path to load the selfloop information file produced during data preprocessing step')
+    parser.add_argument( '--top_ccc_file', type=str, default='NEST_figures_input_MERFISH_plot/Female_Parenting_Excitatory_id19_bregma0.11_top20percent.csv', help='Path to load the selected top CCC file produced during data postprocessing step')
+    parser.add_argument( '--output_name', type=str, default='NEST_figures_output_MERFISH_plot/', help='Output file name prefix according to user\'s choice')
     args = parser.parse_args()
 
 
@@ -207,7 +207,7 @@ if __name__ == "__main__":
             continue        
         ligand = csv_record_final[k][2]
         receptor = csv_record_final[k][3]
-        rank = csv_record_final[k][2][4]
+        rank = csv_record_final[k][4]
         each_node_outgoing[i].append([j, ligand, receptor, k, rank]) 
     
     # all possible 2-hop pattern count
