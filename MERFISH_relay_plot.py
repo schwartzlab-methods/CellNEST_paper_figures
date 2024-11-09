@@ -57,6 +57,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument( '--data_name', type=str, default='Female_Parenting_Excitatory_id19_bregma0.11', help='The name of dataset') # 
     parser.add_argument( '--top_edge_count', type=int, default=1000, help='Number of the top communications to plot. To plot all insert -1') # 
+    parser.add_argument( '--relay_score', type=int, default=1, help='Relay count or score? ) #
     parser.add_argument( '--barcode_info_file', type=str, default='NEST_figures_input/Female_Parenting_Excitatory_id19_bregma0.11_barcode_info', help='Path to load the barcode information file produced during data preprocessing step')
     parser.add_argument( '--annotation_file_path', type=str, default='', help='Path to load the annotation file in csv format (if available) ') #_ayah_histology
     parser.add_argument( '--selfloop_info_file', type=str, default='NEST_figures_input/Female_Parenting_Excitatory_id19_bregma0.11_self_loop_record', help='Path to load the selfloop information file produced during data preprocessing step')
@@ -206,7 +207,8 @@ if __name__ == "__main__":
             continue        
         ligand = csv_record_final[k][2]
         receptor = csv_record_final[k][3]
-        each_node_outgoing[i].append([j, ligand, receptor, k]) 
+        rank = csv_record_final[k][2][4]
+        each_node_outgoing[i].append([j, ligand, receptor, k, rank]) 
     
     # all possible 2-hop pattern count
     pattern_distribution = defaultdict(list)
@@ -219,6 +221,7 @@ if __name__ == "__main__":
             j = tupple[0]
             lig_rec_1 = tupple[1]+'-'+tupple[2]
             record_id_1 = tupple[3]
+            edge_score = tupple[4]
             if j in each_node_outgoing:
                 for tupple_next in each_node_outgoing[j]: # second hop
                     k = tupple_next[0]
@@ -226,51 +229,86 @@ if __name__ == "__main__":
                         continue
                     lig_rec_2 = tupple_next[1]+'-'+tupple_next[2]
                     record_id_2 = tupple_next[3]
-                    pattern_distribution[lig_rec_1 + ' to ' + lig_rec_2].append(1)
+                    pattern_score = edge_score + tupple_next[4]
+                    pattern_distribution[lig_rec_1 + ' to ' + lig_rec_2].append(pattern_score)
                     pattern_distribution_cell_info[lig_rec_1 + ' to ' + lig_rec_2].append([barcode_info[i], barcode_info[j], barcode_info[k]]) # a_id, b_id, c_id
                     relay = lig_rec_1 + ' to ' + lig_rec_2
                     if relay == target_relay:
                         edge_list_2hop.append([record_id_1,record_id_2])
     
     
-
-    two_hop_pattern_distribution = []
-    same_count = 0
-    for key in pattern_distribution:
-        count = len(pattern_distribution[key])
-        two_hop_pattern_distribution.append([key, count]) 
-        #if lig_rec_1 == lig_rec_2:
-        #    same_count = same_count + 1
-    
-    two_hop_pattern_distribution = sorted(two_hop_pattern_distribution, key = lambda x: x[1], reverse=True) # high to low
-    
-    data_list=dict()
-    data_list['X']=[]
-    data_list['Y']=[] 
-    for i in range (0, 100): #len(two_hop_pattern_distribution)):
-        data_list['X'].append(two_hop_pattern_distribution[i][0])
-        data_list['Y'].append(two_hop_pattern_distribution[i][1])
+    if args.relay_score==-1:
+        two_hop_pattern_distribution = []
+        same_count = 0
+        for key in pattern_distribution:
+            count = len(pattern_distribution[key])
+            score = np.sum(pattern_distribution[key])
+            two_hop_pattern_distribution.append([key, count]) 
+            #if lig_rec_1 == lig_rec_2:
+            #    same_count = same_count + 1
         
-    data_list_pd = pd.DataFrame({
-        'Relay Patterns': data_list['X'],
-        'Pattern Abundance (#)': data_list['Y']
-    })
+        two_hop_pattern_distribution = sorted(two_hop_pattern_distribution, key = lambda x: x[1], reverse=True) # high to low
+        
+        data_list=dict()
+        data_list['X']=[]
+        data_list['Y']=[] 
+        for i in range (0, 100): #len(two_hop_pattern_distribution)):
+            data_list['X'].append(two_hop_pattern_distribution[i][0])
+            data_list['Y'].append(two_hop_pattern_distribution[i][1])
+            
+        data_list_pd = pd.DataFrame({
+            'Relay Patterns': data_list['X'],
+            'Pattern Abundance (#)': data_list['Y']
+        })
+    
+        chart = alt.Chart(data_list_pd).mark_bar().encode(
+            x=alt.X("Relay Patterns:N", axis=alt.Axis(labelAngle=45), sort='-y'),
+            y='Pattern Abundance (#)'
+        )
+    
+        chart.save(output_name + args.data_name +'_pattern_distribution.html')
+        data_list_pd.to_csv(output_name + args.data_name +'_top20p_topEdge'+str(args.top_edge_count)+'_relay_count.csv', index=False)
 
-    chart = alt.Chart(data_list_pd).mark_bar().encode(
-        x=alt.X("Relay Patterns:N", axis=alt.Axis(labelAngle=45), sort='-y'),
-        y='Pattern Abundance (#)'
-    )
+            
+    elif args.relay_score == 1:
+        two_hop_pattern_distribution = []
+        same_count = 0
+        for key in pattern_distribution:
+            score = np.sum(pattern_distribution[key])
+            two_hop_pattern_distribution.append([key, score]) 
+            #if lig_rec_1 == lig_rec_2:
+            #    same_count = same_count + 1
+        
+        two_hop_pattern_distribution = sorted(two_hop_pattern_distribution, key = lambda x: x[1], reverse=True) # high to low
+        
+        data_list=dict()
+        data_list['X']=[]
+        data_list['Y']=[] 
+        for i in range (0, 100): #len(two_hop_pattern_distribution)):
+            data_list['X'].append(two_hop_pattern_distribution[i][0])
+            data_list['Y'].append(two_hop_pattern_distribution[i][1])
+            
+        data_list_pd = pd.DataFrame({
+            'Relay Patterns': data_list['X'],
+            'Pattern Score (#)': data_list['Y']
+        })
+    
+        chart = alt.Chart(data_list_pd).mark_bar().encode(
+            x=alt.X("Relay Patterns:N", axis=alt.Axis(labelAngle=45), sort='-y'),
+            y='Pattern Score (#)'
+        )
+    
+        chart.save(output_name + args.data_name +'_pattern_score.html')
 
-    chart.save(output_name + args.data_name +'_pattern_distribution.html')
-    ######################### save as table format and numpy format ########
-    data_list_pd.to_csv(output_name + args.data_name +'_top20p_topEdge'+str(args.top_edge_count)+'_relay_count.csv', index=False)
-  
+        ######################### save as table format and numpy format ########
+        data_list_pd.to_csv(output_name + args.data_name +'_top20p_topEdge'+str(args.top_edge_count)+'_relay_score.csv', index=False)
+    ####################################################################################
     with gzip.open(output_name + args.data_name + 'top20p_topEdge'+str(args.top_edge_count)+'_pattern_distribution_cell_info', 'wb') as fp: 
-	    pickle.dump(pattern_distribution_cell_info, fp)
+        pickle.dump(pattern_distribution_cell_info, fp)
 
     with gzip.open(output_name + args.data_name + 'top20p_topEdge'+str(args.top_edge_count)+'_pattern_distribution_cell_info', 'rb') as fp:  
-	    pattern_distribution_cell_info = pickle.load(fp)
-        
+        pattern_distribution_cell_info = pickle.load(fp)
+            
     ######################### Plotting the two hops #####################
     set1 = altairThemes.get_colour_scheme("Set1", unique_component_count)
     colors = set1
