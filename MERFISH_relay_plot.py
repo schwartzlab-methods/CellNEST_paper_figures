@@ -56,13 +56,13 @@ def plot(df):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument( '--data_name', type=str, default='Female_Parenting_Excitatory_id19_bregma0.11', help='The name of dataset') # 
-    parser.add_argument( '--top_edge_count', type=int, default=1000, help='Number of the top communications to plot. To plot all insert -1') # 
-    parser.add_argument( '--relay_score', type=int, default=1, help='Relay count or score? ') #
+    parser.add_argument( '--top_edge_count', type=int, default=2000, help='Number of the top communications to plot. To plot all insert -1') # 
+    parser.add_argument( '--relay_score', type=int, default=-1, help='Relay count or score? ') #
     parser.add_argument( '--barcode_info_file', type=str, default='NEST_figures_input_MERFISH_plot/Female_Parenting_Excitatory_id19_bregma0.11_barcode_info', help='Path to load the barcode information file produced during data preprocessing step')
     parser.add_argument( '--annotation_file_path', type=str, default='', help='Path to load the annotation file in csv format (if available) ') #_ayah_histology
     parser.add_argument( '--selfloop_info_file', type=str, default='NEST_figures_input_MERFISH_plot/Female_Parenting_Excitatory_id19_bregma0.11_self_loop_record', help='Path to load the selfloop information file produced during data preprocessing step')
     parser.add_argument( '--top_ccc_file', type=str, default='NEST_figures_input_MERFISH_plot/Female_Parenting_Excitatory_id19_bregma0.11_top20percent.csv', help='Path to load the selected top CCC file produced during data postprocessing step')
-    parser.add_argument( '--output_name', type=str, default='NEST_figures_output_MERFISH_plot/', help='Output file name prefix according to user\'s choice')
+    parser.add_argument( '--output_name', type=str, default='NEST_figures_output/', help='Output file name prefix according to user\'s choice')
     args = parser.parse_args()
 
 
@@ -215,7 +215,7 @@ if __name__ == "__main__":
     # pattern_distribution['ligand-receptor to ligand-receptor']=[1,1,1,1, ...]
     pattern_distribution_cell_info = defaultdict(list)
     edge_list_2hop = []
-    target_relay = 'PNOC-OPRD1 to PNOC-LPAR1' #'PSAP-LRP1 to APOE-LRP1' #'PSAP-LRP1 to PSAP-LRP1'
+    target_relay = 'PNOC-LPAR1 to BDNF-ESR1'  #'PNOC-OPRD1 to PNOC-LPAR1' #'PSAP-LRP1 to APOE-LRP1' #'PSAP-LRP1 to PSAP-LRP1'
     for i in each_node_outgoing:
         for tupple in each_node_outgoing[i]: # first hop
             j = tupple[0]
