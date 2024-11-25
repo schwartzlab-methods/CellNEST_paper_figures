@@ -146,7 +146,7 @@ if __name__ == "__main__":
     csv_record_final = []
     csv_record_final.append(csv_record[0])
     for record in range (1, len(csv_record)-1):
-        if csv_record[record][9] >= args.p_value_cutoff:
+        if csv_record[record][9] <= args.p_value_cutoff:
             csv_record_final.append(csv_record[record])
 
     
