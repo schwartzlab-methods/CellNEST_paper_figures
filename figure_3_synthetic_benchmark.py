@@ -43,26 +43,30 @@ for t in range (0, 3):
     with gzip.open(args.data_path + sample_name[t] +'_'+'naive_model', 'rb') as fp: #b, b_1, a
         plot_dict_temp = pickle.load(fp) #a - [0:5]
     
-    plot_dict['FPR'].append(0)
+    plot_dict['Top percentage of total detection'].append(0)
     plot_dict['TPR'].append(0)
     plot_dict['Type'].append("Naive"+sample_type[t]) #(plot_dict_temp['Type'][0])
+    percent_detected = 0
     for i in range (0, len(plot_dict_temp['Type'])):
-        plot_dict['FPR'].append(plot_dict_temp['FPR'][i])
+        plot_dict['Top percentage of total detection'].append(percent_detected) #plot_dict_temp['FPR'][i]) #
         plot_dict['TPR'].append(plot_dict_temp['TPR'][i])
         plot_dict['Type'].append("Naive"+sample_type[t]) #(plot_dict_temp['Type'][i])
+        percent_detected = percent_detected + 10
     
     with gzip.open(args.data_path + sample_name[t]  +'_'+'rank_product_10runs', 'rb') as fp: #b, b_1, a
         plot_dict_temp = pickle.load(fp) #a - [0:5]
 
-    plot_dict_temp['FPR'].append(1.0)
+    plot_dict_temp['Top percentage of total detection'].append(1.0)
     plot_dict_temp['TPR'].append(1.0)
     plot_dict_temp['Type'].append(plot_dict_temp['Type'][1])
     
-    plot_dict['FPR'].append(0)
+    plot_dict['Top percentage of total detection'].append(0)
     plot_dict['TPR'].append(0)
     plot_dict['Type'].append("NEST"+sample_type[t]) #(plot_dict_temp['Type'][0])
+
+    percent_detected = 0
     for i in range (0, len(plot_dict_temp['Type'])):
-        plot_dict['FPR'].append(plot_dict_temp['FPR'][i])
+        plot_dict['Top percentage of total detection'].append(percent_detected) #plot_dict_temp['FPR'][i]) #plot_dict['FPR'].append(plot_dict_temp['FPR'][i])
         plot_dict['TPR'].append(plot_dict_temp['TPR'][i])
         plot_dict['Type'].append("NEST"+sample_type[t]) #(plot_dict_temp['Type'][i])
     
@@ -70,15 +74,16 @@ for t in range (0, 3):
     with gzip.open(args.data_path + sample_name_alt[t]  +'_'+'rank_product_10runs', 'rb') as fp: #b, b_1, a
         plot_dict_temp = pickle.load(fp) #a - [0:5]
 
-    plot_dict_temp['FPR'].append(1.0)
+    plot_dict_temp['Top percentage of total detection'].append(1.0)
     plot_dict_temp['TPR'].append(1.0)
     plot_dict_temp['Type'].append(plot_dict_temp['Type'][1])
     
-    plot_dict['FPR'].append(0)
+    plot_dict['Top percentage of total detection'].append(0)
     plot_dict['TPR'].append(0)
     plot_dict['Type'].append("NEST_alternate_cutOff"+sample_type[t]) #(plot_dict_temp['Type'][0])
+    percent_detected = 0
     for i in range (0, len(plot_dict_temp['Type'])):
-        plot_dict['FPR'].append(plot_dict_temp['FPR'][i])
+        plot_dict['Top percentage of total detection'].append(percent_detected) #plot_dict_temp['FPR'][i]) # plot_dict['FPR'].append(plot_dict_temp['FPR'][i])
         plot_dict['TPR'].append(plot_dict_temp['TPR'][i])
         plot_dict['Type'].append("NEST_alternate_cutOff"+sample_type[t]) #(plot_dict_temp['Type'][i])
  
@@ -93,11 +98,12 @@ for t in range (0, 3):
     
 
     
-    plot_dict['FPR'].append(0)
+    plot_dict['Top percentage of total detection'].append(0)
     plot_dict['TPR'].append(0)
     plot_dict['Type'].append("NEST_ReLU"+sample_type[t]) #(plot_dict_temp['Type'][0])
+    percent_detected = 0
     for i in range (0, len(plot_dict_temp['Type'])):
-        plot_dict['FPR'].append(plot_dict_temp['FPR'][i])
+        plot_dict['Top percentage of total detection'].append(percent_detected) #plot_dict_temp['FPR'][i]) #  plot_dict['FPR'].append(plot_dict_temp['FPR'][i])
         plot_dict['TPR'].append(plot_dict_temp['TPR'][i])
         plot_dict['Type'].append("NEST_ReLU"+sample_type[t]) #(plot_dict_temp['Type'][i])
     '''
@@ -145,11 +151,12 @@ for t in range (0, 3): #len(sample_name)):
     with gzip.open(args.data_path +  sample_name[t] +'_'+'naive_model', 'rb') as fp: #b, b_1, a
         plot_dict_temp = pickle.load(fp) #a - [0:5]
     
-    plot_dict['FPR'].append(0)
+    plot_dict['Top percentage of total detection'].append(0)
     plot_dict['TPR'].append(0)
     plot_dict['Type'].append("Naive"+sample_type[t]) #(plot_dict_temp['Type'][0])
+    percent_detected = 0
     for i in range (0, len(plot_dict_temp['Type'])):
-        plot_dict['FPR'].append(plot_dict_temp['FPR'][i])
+        plot_dict['Top percentage of total detection'].append(percent_detected) #plot_dict_temp['FPR'][i]) #plot_dict['FPR'].append(plot_dict_temp['FPR'][i])
         plot_dict['TPR'].append(plot_dict_temp['TPR'][i])
         plot_dict['Type'].append("Naive"+sample_type[t]) #(plot_dict_temp['Type'][i])
     ###
@@ -157,16 +164,17 @@ for t in range (0, 3): #len(sample_name)):
     with gzip.open(args.data_path + sample_name[t] +'_'+'rank_product_10runs', 'rb') as fp: #b, b_1, a
         plot_dict_temp = pickle.load(fp) #a - [0:5]
     
-    plot_dict_temp['FPR'].append(1.0)
+    plot_dict_temp['Top percentage of total detection'].append(1.0)
     plot_dict_temp['TPR'].append(1.0)
     plot_dict_temp['Type'].append(plot_dict_temp['Type'][1])
     
     
-    plot_dict['FPR'].append(0)
+    plot_dict['Top percentage of total detection'].append(0)
     plot_dict['TPR'].append(0)
     plot_dict['Type'].append("NEST"+sample_type[t]) #(plot_dict_temp['Type'][0])
+    percent_detected = 0
     for i in range (0, len(plot_dict_temp['Type'])):
-        plot_dict['FPR'].append(plot_dict_temp['FPR'][i])
+        plot_dict['Top percentage of total detection'].append(percent_detected) #plot_dict_temp['FPR'][i]) #plot_dict['FPR'].append(plot_dict_temp['FPR'][i])
         plot_dict['TPR'].append(plot_dict_temp['TPR'][i])
         plot_dict['Type'].append("NEST"+sample_type[t]) #(plot_dict_temp['Type'][i])
     
@@ -174,16 +182,17 @@ for t in range (0, 3): #len(sample_name)):
     with gzip.open(args.data_path + sample_name_alt[t] +'_'+'rank_product_10runs', 'rb') as fp: #b, b_1, a
         plot_dict_temp = pickle.load(fp) #a - [0:5]
     
-    plot_dict_temp['FPR'].append(1.0)
+    plot_dict_temp['Top percentage of total detection'].append(1.0)
     plot_dict_temp['TPR'].append(1.0)
     plot_dict_temp['Type'].append(plot_dict_temp['Type'][1])
     
     
-    plot_dict['FPR'].append(0)
+    plot_dict['Top percentage of total detection'].append(0)
     plot_dict['TPR'].append(0)
     plot_dict['Type'].append("NEST_alternate_cutOff"+sample_type[t]) #(plot_dict_temp['Type'][0])
+    percent_detected = 0
     for i in range (0, len(plot_dict_temp['Type'])):
-        plot_dict['FPR'].append(plot_dict_temp['FPR'][i])
+        plot_dict['Top percentage of total detection'].append(percent_detected) #plot_dict_temp['FPR'][i]) #plot_dict['FPR'].append(plot_dict_temp['FPR'][i])
         plot_dict['TPR'].append(plot_dict_temp['TPR'][i])
         plot_dict['Type'].append("NEST_alternate_cutOff"+sample_type[t]) #(plot_dict_temp['Type'][i])
     
@@ -196,11 +205,12 @@ for t in range (0, 3): #len(sample_name)):
 #    plot_dict_temp['Type'].append(plot_dict_temp['Type'][1])
     
     
-    plot_dict['FPR'].append(0)
+    plot_dict['Top percentage of total detection'].append(0)
     plot_dict['TPR'].append(0)
     plot_dict['Type'].append("NEST_ReLU"+sample_type[t]) #(plot_dict_temp['Type'][0])
+    percent_detected = 0
     for i in range (0, len(plot_dict_temp['Type'])):
-        plot_dict['FPR'].append(plot_dict_temp['FPR'][i])
+        plot_dict['Top percentage of total detection'].append(percent_detected) #plot_dict_temp['FPR'][i]) #plot_dict['FPR'].append(plot_dict_temp['FPR'][i])
         plot_dict['TPR'].append(plot_dict_temp['TPR'][i])
         plot_dict['Type'].append("NEST_ReLU"+sample_type[t]) #(plot_dict_temp['Type'][i])
 
@@ -262,11 +272,12 @@ for t in range (0, 3): #len(sample_name)):
     with gzip.open(args.data_path +  sample_name[t] +'_'+'naive_model', 'rb') as fp: #b, b_1, a
         plot_dict_temp = pickle.load(fp) #a - [0:5]
     
-    plot_dict['FPR'].append(0)
+    plot_dict['Top percentage of total detection'].append(0)
     plot_dict['TPR'].append(0)
     plot_dict['Type'].append("Naive"+sample_type[t]) #(plot_dict_temp['Type'][0])
+    percent_detected = 0
     for i in range (0, len(plot_dict_temp['Type'])):
-        plot_dict['FPR'].append(plot_dict_temp['FPR'][i])
+        plot_dict['Top percentage of total detection'].append(percent_detected) #plot_dict_temp['FPR'][i]) #plot_dict['FPR'].append(plot_dict_temp['FPR'][i])
         plot_dict['TPR'].append(plot_dict_temp['TPR'][i])
         plot_dict['Type'].append("Naive"+sample_type[t]) #(plot_dict_temp['Type'][i])
     ###
@@ -274,16 +285,17 @@ for t in range (0, 3): #len(sample_name)):
     with gzip.open(args.data_path +  sample_name[t] +'_'+'rank_product_10runs', 'rb') as fp: #b, b_1, a
         plot_dict_temp = pickle.load(fp) #a - [0:5]
     
-    plot_dict_temp['FPR'].append(1.0)
+    plot_dict_temp['Top percentage of total detection'].append(1.0)
     plot_dict_temp['TPR'].append(1.0)
     plot_dict_temp['Type'].append(plot_dict_temp['Type'][1])
     
     
-    plot_dict['FPR'].append(0)
+    plot_dict['Top percentage of total detection'].append(0)
     plot_dict['TPR'].append(0)
     plot_dict['Type'].append("NEST"+sample_type[t]) #(plot_dict_temp['Type'][0])
+    percent_detected = 0
     for i in range (0, len(plot_dict_temp['Type'])):
-        plot_dict['FPR'].append(plot_dict_temp['FPR'][i])
+        plot_dict['Top percentage of total detection'].append(percent_detected) #plot_dict_temp['FPR'][i]) #plot_dict['FPR'].append(plot_dict_temp['FPR'][i])
         plot_dict['TPR'].append(plot_dict_temp['TPR'][i])
         plot_dict['Type'].append("NEST"+sample_type[t]) #(plot_dict_temp['Type'][i])
     
@@ -291,16 +303,17 @@ for t in range (0, 3): #len(sample_name)):
     with gzip.open(args.data_path + sample_name_alt[t] +'_'+'rank_product_10runs', 'rb') as fp: #b, b_1, a
         plot_dict_temp = pickle.load(fp) #a - [0:5]
     
-    plot_dict_temp['FPR'].append(1.0)
+    plot_dict_temp['Top percentage of total detection'].append(1.0)
     plot_dict_temp['TPR'].append(1.0)
     plot_dict_temp['Type'].append(plot_dict_temp['Type'][1])
     
     
-    plot_dict['FPR'].append(0)
+    plot_dict['Top percentage of total detection'].append(0)
     plot_dict['TPR'].append(0)
     plot_dict['Type'].append("NEST_alternate_cutOff"+sample_type[t]) #(plot_dict_temp['Type'][0])
+    percent_detected = 0
     for i in range (0, len(plot_dict_temp['Type'])):
-        plot_dict['FPR'].append(plot_dict_temp['FPR'][i])
+        plot_dict['Top percentage of total detection'].append(percent_detected) #plot_dict_temp['FPR'][i]) #plot_dict['FPR'].append(plot_dict_temp['FPR'][i])
         plot_dict['TPR'].append(plot_dict_temp['TPR'][i])
         plot_dict['Type'].append("NEST_alternate_cutOff"+sample_type[t]) #(plot_dict_temp['Type'][i])
     
@@ -313,11 +326,12 @@ for t in range (0, 3): #len(sample_name)):
     #plot_dict_temp['Type'].append(plot_dict_temp['Type'][1])
     
     
-    plot_dict['FPR'].append(0)
+    plot_dict['Top percentage of total detection'].append(0)
     plot_dict['TPR'].append(0)
     plot_dict['Type'].append("NEST_relu"+sample_type[t]) #(plot_dict_temp['Type'][0])
+    percent_detected = 0
     for i in range (0, len(plot_dict_temp['Type'])):
-        plot_dict['FPR'].append(plot_dict_temp['FPR'][i])
+        plot_dict['Top percentage of total detection'].append(percent_detected) #plot_dict_temp['FPR'][i]) #plot_dict['FPR'].append(plot_dict_temp['FPR'][i])
         plot_dict['TPR'].append(plot_dict_temp['TPR'][i])
         plot_dict['Type'].append("NEST_relu"+sample_type[t]) #(plot_dict_temp['Type'][i])
     
@@ -374,11 +388,12 @@ for t in range (0, 3):
     with gzip.open(args.data_path +  sample_name[t] +'_'+'naive_model', 'rb') as fp: #b, b_1, a
         plot_dict_temp = pickle.load(fp) #a - [0:5]
     
-    plot_dict['FPR'].append(0)
+    plot_dict['Top percentage of total detection'].append(0)
     plot_dict['TPR'].append(0)
     plot_dict['Type'].append("Naive"+sample_type[t]) #(plot_dict_temp['Type'][0])
+    percent_detected = 0
     for i in range (0, len(plot_dict_temp['Type'])):
-        plot_dict['FPR'].append(plot_dict_temp['FPR'][i])
+        plot_dict['Top percentage of total detection'].append(percent_detected) #plot_dict_temp['FPR'][i]) #plot_dict['FPR'].append(plot_dict_temp['FPR'][i])
         plot_dict['TPR'].append(plot_dict_temp['TPR'][i])
         plot_dict['Type'].append("Naive"+sample_type[t]) #(plot_dict_temp['Type'][i])
     ###
@@ -387,15 +402,16 @@ for t in range (0, 3):
     with gzip.open(args.data_path +  sample_name[t] +'_'+'rank_product_10runs', 'rb') as fp: #b, b_1, a
         plot_dict_temp = pickle.load(fp) #a - [0:5]
     
-    plot_dict_temp['FPR'].append(1.0)
+    plot_dict_temp['Top percentage of total detection'].append(1.0)
     plot_dict_temp['TPR'].append(1.0)
     plot_dict_temp['Type'].append(plot_dict_temp['Type'][1])
     
-    plot_dict['FPR'].append(0)
+    plot_dict['Top percentage of total detection'].append(0)
     plot_dict['TPR'].append(0)
     plot_dict['Type'].append("NEST"+sample_type[t]) #(plot_dict_temp['Type'][0])
+    percent_detected = 0
     for i in range (0, len(plot_dict_temp['Type'])):
-        plot_dict['FPR'].append(plot_dict_temp['FPR'][i])
+        plot_dict['Top percentage of total detection'].append(percent_detected) #plot_dict_temp['FPR'][i]) #plot_dict['FPR'].append(plot_dict_temp['FPR'][i])
         plot_dict['TPR'].append(plot_dict_temp['TPR'][i])
         plot_dict['Type'].append("NEST"+sample_type[t]) #(plot_dict_temp['Type'][i])
     
@@ -403,15 +419,16 @@ for t in range (0, 3):
     with gzip.open(args.data_path +  sample_name_alternate[t] +'_'+'rank_product_10runs', 'rb') as fp: #b, b_1, a
         plot_dict_temp = pickle.load(fp) #a - [0:5]
     
-    plot_dict_temp['FPR'].append(1.0)
+    plot_dict_temp['Top percentage of total detection'].append(1.0)
     plot_dict_temp['TPR'].append(1.0)
     plot_dict_temp['Type'].append(plot_dict_temp['Type'][1])
     
-    plot_dict['FPR'].append(0)
+    plot_dict['Top percentage of total detection'].append(0)
     plot_dict['TPR'].append(0)
     plot_dict['Type'].append("NEST_alternate_cutOff"+sample_type[t]) #(plot_dict_temp['Type'][0])
+    percent_detected = 0
     for i in range (0, len(plot_dict_temp['Type'])):
-        plot_dict['FPR'].append(plot_dict_temp['FPR'][i])
+        plot_dict['Top percentage of total detection'].append(percent_detected) #plot_dict_temp['FPR'][i]) #plot_dict['FPR'].append(plot_dict_temp['FPR'][i])
         plot_dict['TPR'].append(plot_dict_temp['TPR'][i])
         plot_dict['Type'].append("NEST_alternate_cutOff"+sample_type[t]) #(plot_dict_temp['Type'][i])
     
@@ -425,11 +442,12 @@ for t in range (0, 3):
 #    plot_dict_temp['Type'].append(plot_dict_temp['Type'][1])
     
     
-    plot_dict['FPR'].append(0)
+    plot_dict['Top percentage of total detection'].append(0)
     plot_dict['TPR'].append(0)
     plot_dict['Type'].append("NEST_ReLU"+sample_type[t]) #(plot_dict_temp['Type'][0])
+    percent_detected = 0
     for i in range (0, len(plot_dict_temp['Type'])):
-        plot_dict['FPR'].append(plot_dict_temp['FPR'][i])
+        plot_dict['Top percentage of total detection'].append(percent_detected) #plot_dict_temp['FPR'][i]) #plot_dict['FPR'].append(plot_dict_temp['FPR'][i])
         plot_dict['TPR'].append(plot_dict_temp['TPR'][i])
         plot_dict['Type'].append("NEST_ReLU"+sample_type[t]) #(plot_dict_temp['Type'][i])
     
@@ -438,7 +456,7 @@ for t in range (0, 3):
     with gzip.open(args.data_path +   sample_name[t]  +'_'+'COMMOT', 'rb') as fp: #b, b_1, a
         plot_dict_temp = pickle.load(fp) #a - [0:5]
         
-    plot_dict['FPR'].append(0)
+    plot_dict['Top percentage of total detection'].append(0)
     plot_dict['TPR'].append(0)
     plot_dict['Type'].append('COMMOT'+sample_type[t]) #(plot_dict_temp['Type'][0])
     for i in range (0, len(plot_dict_temp['Type'])):
