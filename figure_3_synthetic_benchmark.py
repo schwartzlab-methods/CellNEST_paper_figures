@@ -100,7 +100,7 @@ for t in range (0, 3):
         plot_dict['FPR'].append(plot_dict_temp['FPR'][i])
         plot_dict['TPR'].append(plot_dict_temp['TPR'][i])
         plot_dict['Type'].append("NEST_ReLU"+sample_type[t]) #(plot_dict_temp['Type'][i])
-    
+    '''
     with gzip.open(args.data_path + sample_name[t]  +'_'+'COMMOT', 'rb') as fp: # t = 0,1
         plot_dict_temp = pickle.load(fp) #a - [0:5]
         
@@ -113,7 +113,7 @@ for t in range (0, 3):
         plot_dict['Type'].append('COMMOT'+sample_type[t]) #(plot_dict_temp['Type'][i])
     
         
-
+    '''
 
 ###################
 
@@ -205,7 +205,7 @@ for t in range (0, 3): #len(sample_name)):
         plot_dict['Type'].append("NEST_ReLU"+sample_type[t]) #(plot_dict_temp['Type'][i])
 
  
-    
+    '''   
     ######
     with gzip.open(args.data_path + sample_name[t]  +'_'+'Niches', 'rb') as fp: #b, b_1, a
         plot_dict_temp = pickle.load(fp) #a - [0:5]
@@ -234,7 +234,7 @@ for t in range (0, 3): #len(sample_name)):
     
         
 
-    
+    '''
     data_list_pd = pd.DataFrame(plot_dict)    
     chart = alt.Chart(data_list_pd).mark_line().encode(
         x='FPR:Q',
@@ -322,7 +322,7 @@ for t in range (0, 3): #len(sample_name)):
         plot_dict['Type'].append("NEST_relu"+sample_type[t]) #(plot_dict_temp['Type'][i])
     
     ######
-    
+    '''
     with gzip.open(args.data_path +  sample_name[t]  +'_'+'Niches', 'rb') as fp: #b, b_1, a
         plot_dict_temp = pickle.load(fp) #a - [0:5]
         
@@ -347,7 +347,7 @@ for t in range (0, 3): #len(sample_name)):
         plot_dict['TPR'].append(plot_dict_temp['TPR'][i])
         plot_dict['Type'].append('COMMOT'+sample_type[t]) #(plot_dict_temp['Type'][i])
     
-       
+    '''
     
     data_list_pd = pd.DataFrame(plot_dict)    
     chart = alt.Chart(data_list_pd).mark_line().encode(
@@ -434,6 +434,7 @@ for t in range (0, 3):
         plot_dict['Type'].append("NEST_ReLU"+sample_type[t]) #(plot_dict_temp['Type'][i])
     
     ######
+    '''
     with gzip.open(args.data_path +   sample_name[t]  +'_'+'COMMOT', 'rb') as fp: #b, b_1, a
         plot_dict_temp = pickle.load(fp) #a - [0:5]
         
@@ -446,7 +447,7 @@ for t in range (0, 3):
         plot_dict['Type'].append('COMMOT'+sample_type[t]) #(plot_dict_temp['Type'][i])
     
        
-
+    '''
     data_list_pd = pd.DataFrame(plot_dict)    
     chart = alt.Chart(data_list_pd).mark_line().encode(
         x='FPR:Q',
