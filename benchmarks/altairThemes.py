@@ -31,7 +31,7 @@ def publishTheme():
     font = "Arial"
     labelFont = "Arial"
     sourceFont = "Arial"
-    fontSize = 8  # Size 8pt for publishing
+    fontSize = 10.66670036  # Size 8pt for publishing
 
     # Axes
     axisColor = "#000000"

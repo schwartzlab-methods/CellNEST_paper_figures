@@ -6,23 +6,37 @@ directories:
   raw_result: "./result"
   raw_result_user: "./raw_result" 
   filtered_result: "./filtered_result"
+  paper_figs: "./paper_figures"
   pdac_data: "/mnt/data0/dpaliwal/software/pdac-microenv/data/processed"
 
 params:
   datasets: [
-#    "lymph_node", 
-#    "uniform_distribution_no_noise", 
-#    "uniform_distribution_low_noise", 
-#    "uniform_distribution_high_noise", 
-#    "mixed_distribution_no_noise", 
-#    "mixed_distribution_low_noise", 
-#    "mixed_distribution_high_noise", 
-#    "equidistant_distribution_no_noise", 
-#    "equidistant_distribution_low_noise", 
-#    "equidistant_distribution_high_noise",
+    "uniform_distribution_no_noise", 
+    "uniform_distribution_low_noise", 
+    "uniform_distribution_high_noise", 
+    "mixed_distribution_no_noise", 
+    "mixed_distribution_low_noise", 
+    "mixed_distribution_high_noise", 
+    "equidistant_distribution_no_noise", 
+    "equidistant_distribution_low_noise", 
+    "equidistant_distribution_high_noise",
     "equidistant_distribution_random_ccc_wo_relay",
     "mixed_distribution_random_ccc_wo_relay",
-    "uniform_distribution_random_ccc_wo_relay"
+    "uniform_distribution_random_ccc_wo_relay",
+    "lymph_node",
+    "equidistant_distribution_mechanistic_high_noise",
+    "equidistant_distribution_mechanistic_low_noise",
+    "equidistant_distribution_mechanistic_no_noise",
+    "mixed_distribution_mechanistic_high_noise",
+    "mixed_distribution_mechanistic_low_noise",
+    "mixed_distribution_mechanistic_no_noise",
+    "uniform_distribution_mechanistic_high_noise",
+    "uniform_distribution_mechanistic_low_noise",
+    "uniform_distribution_mechanistic_no_noise",
+    "equidistant_distribution_mechanistic_random_ccc_wo_relay",
+    "uniform_distribution_mechanistic_random_ccc_wo_relay",
+    "mixed_distribution_mechanistic_random_ccc_wo_relay"
   ]
-  tools: ["cellchat", "giotto", "TWCOM"]
+  cluster_tools: ["cellchat", "giotto", "TWCOM"]
+  sc_tools: ["COMMOT", "NICHES", "CellNEST", "CytoSignal"] # "CellNEST_ReLU", "Naive", "CellNEST_Alternate-Cutoff"]
   pdac_samples: ["exp1_A1", "exp1_B1", "exp1_C1", "exp1_D1", "exp2_A1", "exp2_B1", "exp2_C1", "exp2_D1", "exp4_A1", "exp4_B1", "exp4_C1", "exp4_D1"]

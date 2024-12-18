@@ -18,6 +18,22 @@ import matplotlib
 matplotlib.use('Agg')
 import os
 import yaml
+import altairThemes
+alt.themes.register("publishTheme", altairThemes.publishTheme)
+alt.themes.enable("publishTheme")
+
+# specific to leiden = 0.6 
+colours = [
+    "brown",    # Cluster 0
+    "red",      # Cluster 1
+    "blue",     # Cluster 2
+    "green",    # Cluster 3
+    "purple",   # Cluster 4 (dark purple)
+    "orange",   # Cluster 5
+    "pink",     # Cluster 6
+    "violet"    # Cluster 7 (light purple)
+]
+
 
 def plotClusters(
         spacerangerDir: str,
@@ -114,13 +130,13 @@ def plotClusters(
 
     data_list_pd = pd.DataFrame(data_list)
 
-    chart = alt.Chart(data_list_pd).mark_point(filled=True).encode(
+    chart = alt.Chart(data_list_pd).mark_point(filled=True, size = 20).encode(
         alt.X('X', scale=alt.Scale(zero=False)),
         alt.Y('Y', scale=alt.Scale(zero=False)),
         tooltip=["cluster_label"],
         #alt.Size('pop:Q'),
-        color=alt.Color('cluster_label:N', scale=alt.Scale(range=colors))
-    ).configure_legend(labelFontSize=6, symbolLimit=50)
+        color=alt.Color('cluster_label:N', title = "cluster", scale = alt.Scale(range = colours))
+    ).configure_legend()
 
     print('output is saved here: '+savePath)
     chart.save(savePath)

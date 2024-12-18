@@ -50,7 +50,7 @@ def filter_nichenet(
 
         return merged_df
 
-def filter_dorothea(organism = "human"):
+def filter_dorothea(organism: str):
     confidence_levels = ['A','B','C','D'] # confidence level E: interactions only supported in literature 
     grn = dc.get_dorothea(
         organism = organism, 
@@ -62,25 +62,27 @@ def filter_dorothea(organism = "human"):
  
     return grn 
     
-def main():
+def compile(organism: str):
     with open("config.yml", "r") as f:
         config = yaml.safe_load(f)
     database_dir = os.path.join(config["directories"]["data"], "protein_database")
-    stringdb = os.path.join(database_dir, "stringdb", "9606.protein.physical.links.detailed.v12.0.txt")
-    string_names = os.path.join(database_dir, "stringdb", "9606.protein.info.v12.0.txt")
+    organism_id = {"human": 9606, "mouse": 10090}
+    stringdb = os.path.join(database_dir, "stringdb", f"{organism_id[organism]}.protein.physical.links.detailed.v12.0.txt")
+    string_names = os.path.join(database_dir, "stringdb", f"{organism_id[organism]}.protein.info.v12.0.txt")
     stringdb_df = query_stringdb(stringdb, string_names)
-    nichenet_db = os.path.join(database_dir, "nichenet_v2", "signaling_network_human_21122021.csv")
+    nichenet_db = os.path.join(database_dir, "nichenet_v2", f"signaling_network_{organism}_21122021.csv")
     nichenet_filtered = filter_nichenet(nichenet_db, stringdb_df)
-    nichenet_out = os.path.join(database_dir, f"{os.path.splitext(os.path.basename(nichenet_db))[0]}_stringdb_scored.csv")
+    nichenet_out = os.path.join(database_dir, f"{organism}_signaling_ppi.csv")
     nichenet_filtered.to_csv(nichenet_out, index = False)
     print(f"Filtered PPI database written to: {nichenet_out}")
-    dorothea_filtered = filter_dorothea()
-    dorothea_out = os.path.join(database_dir, "dorothea_filtered.csv")
+    dorothea_filtered = filter_dorothea(organism)
+    dorothea_out = os.path.join(database_dir, f"{organism}_tf_target.csv")
     dorothea_filtered.to_csv(dorothea_out, index = False)
     print(f"Filtered GRN database written to: {dorothea_out}")
 
 if __name__ == "__main__":
-    main()
+    compile("human")
+    compile("mouse")
 
 
 

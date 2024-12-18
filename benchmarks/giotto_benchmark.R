@@ -1,5 +1,3 @@
-# need to pre-process lymph node?
-
 # https://giottosuite.readthedocs.io/en/master/giottoworkflowanalyses.html?highlight=spatCellCellcom 
 library(Giotto)
 library(yaml)
@@ -8,6 +6,7 @@ library(Matrix)
 library(dplyr)
 library(tibble)
 library(rlang)
+library(jsonlite)
 
 load_obj <- function(data_path) {
     counts <- t(as.matrix(read.csv(file.path(data_path, "counts.csv"), row.names = 1, check.names = F)))
@@ -28,20 +27,35 @@ load_obj <- function(data_path) {
     return(giotto_obj)
 }
 
+computeMaxDist <- function(
+    dataPath,
+    # range for communication in uM 
+    range = 250
+) {
+    spot_size = 55
+    scale_factors <- fromJSON(file.path(dataPath, "spatial", "scalefactors_json.json"))
+    conversion_factor = spot_size / scale_factors$spot_diameter_fullres # 0.6111 um/pixel
+    pix_per_um = (1 / conversion_factor)
+    dist = pix_per_um * range
+    # return distance in pixels
+    return (dist)
+}
+
+
 run_giotto <- function(
     data_path,
     database_path,
     synthetic,
-    output_path
+    output_path,
+    result_dir
 ) {
     giotto_obj <- load_obj(data_path)
     print(giotto_obj@gene_ID)
 
-    giotto_obj <- normalizeGiotto(gobject = giotto_obj)
+    giotto_obj <- normalizeGiotto(gobject = giotto_obj) # default scale factor = 6000
     giotto_obj <- calculateHVG(gobject = giotto_obj)
     giotto_obj <- runPCA(gobject = giotto_obj)
     giotto_obj <- runUMAP(giotto_obj, dimensions_to_use = 1:5)
-    giotto_obj <- createNearestNetwork(gobject = giotto_obj, dimensions_to_use = 1:30)
     # read in database 
     LR_data <- read.csv(database_path, check.names = F)
     cols_to_remove <- c("Annotation", "Reference")
@@ -55,7 +69,18 @@ run_giotto <- function(
     LR_data_det <- LR_data[LR_data$ligand_det & LR_data$receptor_det, ]
     select_ligands = LR_data_det$ligand
     select_receptors = LR_data_det$receptor
-    giotto_obj = createSpatialNetwork(gobject = giotto_obj)
+    if (synthetic) {
+        dataset_name <- basename(data_path)
+        if (grepl("mixed", dataset_name)) {
+            maximum_distance = 30
+        } else {
+            maximum_distance = 4
+        }
+    } else {
+        maximum_distance = computeMaxDist(data_path)
+    }
+    giotto_obj = createSpatialNetwork(gobject = giotto_obj, name = 'Delaunay_network', maximum_distance_delaunay = maximum_distance, minimum_k = 2)
+    giotto_obj = createSpatialNetwork(gobject = giotto_obj, name = "knn_network", method = "kNN", maximum_distance_knn = maximum_distance)
     # spatial CCC
     spatial_all_scores = spatCellCellcom(
         giotto_obj,
@@ -69,19 +94,24 @@ run_giotto <- function(
         cores = 5,
         verbose = 'a lot'
     )
+    print(length(spatial_all_scores))
     # select top lr 
-    selected_spat <- spatial_all_scores[p.adj <= 0.05 & lig_nr > 2 & rec_nr > 2]
-    # spot_results <- clusters_to_spots(result_df = selected_spat, meta_df = meta, sender_col = "lig_cell_type", receiver_col = "rec_cell_type", lri_col = "LR_comb", strength_col = "PI")
+    # lig_nr: total number of cells from lig_cell_type that spatially interact with cells from rec_cell_type
+    # rec_nr: total number of cells from rec_cell_type that spatially interact with cells from lig_cell_type
+    selected_spat <- spatial_all_scores[p.adj <= 0.5 & abs(log2fc) > 0.1 & lig_nr > 2 & rec_nr > 2]
     write.csv(selected_spat, output_path)
 }
 
 main <- function() {
     config <- yaml::read_yaml("config.yml")
     data_dir <- file.path(config$directories$data)
-    result_dir <- file.path(config$directories$raw_result, "giotto")
+    result_dir <- file.path(config$directories$raw_result_user, "giotto")
     dir.create(result_dir, recursive = TRUE)
 
     datasets = config$params$datasets
+    datasets <- datasets[grepl("mechanistic_random_ccc_wo_relay", datasets)]
+    # datasets <- c("lymph_node")
+    # datasets <- c("mixed_distribution_mechanistic_low_noise")
 
     for (dataset in datasets) {
         data_path = file.path(data_dir, dataset)
@@ -93,7 +123,7 @@ main <- function() {
             synthetic = TRUE
             database_path = list.files(path = data_path, pattern = ".*lrdb\\.csv$", full.names = TRUE)[1]
         }
-        run_giotto(data_path, database_path, synthetic, output_path)
+        run_giotto(data_path, database_path, synthetic, output_path, result_dir)
     }
 }
 

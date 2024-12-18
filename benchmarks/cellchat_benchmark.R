@@ -7,6 +7,7 @@ library(hdf5r)
 library(jsonlite)
 library(dplyr)
 library(tibble)
+library(svglite)
 
 # https://htmlpreview.github.io/?https://github.com/jinworks/CellChat/blob/master/tutorial/CellChat_analysis_of_spatial_transcriptomics_data.html 
 
@@ -20,7 +21,8 @@ create_obj <- function(
         # ratio = 1 - do not scale pixel distance 
         # tol - tolerance factor to increase the robustness when comparing the center-to-center distance against the interaction.range
         # tol recommended to be half value of cell/spot size in the unit of um
-        # tol = 1 approximates center-center distance in 150 x 150 pixel array 
+        # used for determining whether considering the cell-pair as spatially proximal if their distance is greater than interaction.range but smaller than “interaction.range + tol”
+        # tol = 1 approximates center-center distance in a 150 x 150 pixel array 
         spatial.factors <- data.frame(ratio = 1, tol = 1)
     } else {
         # locations from full (NOT high/low) resolution images
@@ -37,9 +39,7 @@ create_obj <- function(
     meta$cluster <- as.character(meta$cluster)
     # replace "0" with "zero": error - labels cannot = 0
     meta$cluster <- ifelse(meta$cluster == "0", "zero", meta$cluster) 
-    
     # normalize & log-transform
-    # print(data.input) 
     data.input <- normalizeData(data.input, scale.factor = 10000, do.log = TRUE)
 
     cellchat <- createCellChat(
@@ -58,7 +58,8 @@ run_cellchat <- function(
     data_path,
     database_path,
     synthetic, 
-    output_path
+    out_csv,
+    out_figname
 ) {
     cellchat <- create_obj(synthetic, data_path)
 
@@ -73,30 +74,28 @@ run_cellchat <- function(
         db.user$complex <- ""
         # assume all synthetic interactions are secreted signaling, not contact-based 
         db.user$annotation <- "Secreted Signaling"
-        print(head(db.user))
         db_genes <- union(db.user$ligand, db.user$receptor)
-        print(db_genes)
         gene_info <- data.frame(Symbol = db_genes)
-        print("printing gene info")
-        print(head(gene_info))
         # update database
-        db.new <- updateCellChatDB(db = db.user, gene_info = gene_info)
-        CellChatDB <- db.new
-        cellchat@DB <- CellChatDB
-        cellchat <- subsetData(cellchat, features = rownames(cellchat@data))        
+        CellChatDB.use <- updateCellChatDB(db = db.user, gene_info = gene_info)
+        cellchat@DB <- CellChatDB.use
     } else {
         CellChatDB <- CellChatDB.human
         # exclude non-protein CCC
         CellChatDB.use <- subsetDB(CellChatDB, search = c("Secreted Signaling", "ECM-Receptor", "Cell-Cell Contact"), key = "annotation")
         cellchat@DB <- CellChatDB.use
-        cellchat <- subsetData(cellchat)
     }
-    dplyr::glimpse(CellChatDB$interaction)
+    cellchat <- subsetData(cellchat)
     future::plan("multisession", workers = 4) 
     cellchat <- identifyOverExpressedGenes(cellchat, do.fast = FALSE)
     cellchat <- identifyOverExpressedInteractions(cellchat, variable.both = F)
     if (synthetic) {
-        interaction.range = 4
+        dataset_name <- basename(data_path)
+        if (grepl("mixed", dataset_name)) {       
+            interaction.range = 30
+        } else {
+            interaction.range = 4
+        }
         # scale.distance: we choose this values such that the minimum value of the scaled distances is [1,2]
         # this value can be 1, 0.1, 0.01, 0.001
         scale.distance = 1
@@ -112,9 +111,9 @@ run_cellchat <- function(
     # address for mixed distribution  
     cellchat <- computeCommunProb(
         cellchat, 
-        type = "triMean", 
-        raw.use = TRUE, 
-        distance.use = TRUE, 
+        type = "triMean", # default 
+        raw.use = TRUE, # default 
+        distance.use = TRUE, # default 
         interaction.range = interaction.range, 
         scale.distance = scale.distance,
         contact.dependent = contact.dependent, 
@@ -127,11 +126,15 @@ run_cellchat <- function(
     df.net$target <- as.character(df.net$target)
     df.net$source[df.net$source == "zero"] <- 0
     df.net$target[df.net$target == "zero"] <- 0
-    # filter top prob (strength) 20%
+    ## filter top prob (strength) 20%
     # prob.thresh <- quantile(df.net$prob, 0.80)
-    # df.net.top <- df.net %>% filter(prob >= prob.thresh)
-    # write results
-    write.csv(df.net, output_path)
+    write.csv(df.net, out_csv)
+    if (!synthetic) {
+        lri_oi <- data.frame(interaction_name = c("CCL19_CCR7"))
+        svglite(file = out_figname, width = 8, height = 5)
+        netVisual_individual(cellchat, pairLR.use = lri_oi, signaling = "CCL", layout = "circle")
+        dev.off()
+    }
 }
 
 main <- function() {
@@ -141,10 +144,13 @@ main <- function() {
     dir.create(result_dir, recursive = TRUE)
 
     datasets <- config$params$datasets
+    datasets <- datasets[grepl("mechanistic_random_ccc_wo_relay", datasets)]
+    # datasets <- c("lymph_node")
 
     for (dataset in datasets) {
         data_path = file.path(data_dir, dataset)
-        output_path = file.path(result_dir, paste0(dataset, ".csv"))
+        out_csv = file.path(result_dir, paste0(dataset, ".csv"))
+        out_figname = file.path(result_dir, paste0(dataset, ".svg"))
         if (dataset == "lymph_node") {
             synthetic = FALSE
             database_path = NA # use default CellChat DB
@@ -152,7 +158,7 @@ main <- function() {
             synthetic = TRUE
             database_path = list.files(path = data_path, pattern = ".*lrdb\\.csv$", full.names = TRUE)[1]
         }
-        run_cellchat(data_path, database_path, synthetic, output_path) 
+        run_cellchat(data_path, database_path, synthetic, out_csv, out_figname) 
     }
 }
 

@@ -3,6 +3,7 @@ library(Seurat)
 library(yaml)
 library(jsonlite)
 library(parallel)
+print(packageVersion("TWCOM"))
 
 prepData <- function(
     dataPath
@@ -42,10 +43,12 @@ runTWCOM <- function(
     dbPath,
     annotPath,
     outputPath,
+    outFig,
     synthetic
 ) {
     # normalized matrix 
     expMat <- prepData(dataPath)
+    print(expMat)
     # coordinates 
     coords <- read.csv(file.path(dataPath, "coords.csv"), row.names = 1, check.names = F)
     # order rows of dataframe to match expression matrix column order
@@ -76,7 +79,12 @@ runTWCOM <- function(
             celltype = "cluster"
         )
         # neighbour distance
-        maxDist = 4
+        dataset_name <- basename(dataPath)
+        if (grepl("mixed", dataset_name)) {
+            maxDist <- 4 # attempted 6 - OOM
+        } else {
+            maxDist <- 4
+        }
     } else {
         print(head(annotDf))
         # cell type proportions for spot-based data
@@ -86,19 +94,16 @@ runTWCOM <- function(
         maxDist = computeMaxDist(dataPath, contact_range = 250)
     }
 
-    print("M created")
     rownames(M) <- rownames(annotDf)
-    print(M)
-    print("cell type matrix")
+    print(colnames(expMat))
+    print(rownames(M)) # NULL 
+    print(class(colnames(expMat))) # char
     print("expression matrix")
     print(expMat[1:10, 1:10])
+    print(class(rownames(M))) # NULL 
+    print("cell type matrix")
     # order rows of matrix to match expression matrix column order
     M <- M[match(colnames(expMat), rownames(M)), ]
-
-    print(dim(expMat)) 
-    print(dim(M))
-    print("cell type matrix after re-ordering")
-    # print(M[1:10, 1:10])
 
     restab <- FRETCOM(
         stdat = expMat,
@@ -107,12 +112,19 @@ runTWCOM <- function(
         receptors = receptors,
         coordx = STmeta$x, 
         coordy = STmeta$y, 
-        maxdist = maxDist
+        maxdist = maxDist, 
+        parallel = TRUE, 
+        ncores = detectCores() - 1
     )
     # filter by default q-value = 0.2 
     filtered <- subset(restab, Qvalue < 0.2)
     filtered$lri <- paste(filtered$Ligand, filtered$Receptor, sep = "-") 
     write.csv(filtered, outputPath)
+    if (!synthetic) {
+        svg(file = outFig, width = 12, height = 8)
+        CCCHeatmap(filtered, ligand = "CCL19", receptor = "CCR7")
+        dev.off()
+    }
 }
 
 process_dataset <- function(dataset, config) {
@@ -120,32 +132,37 @@ process_dataset <- function(dataset, config) {
     result_dir <- file.path(config$directories$raw_result, "TWCOM")
     dataPath <- file.path(data_dir, dataset)
     outputPath <- file.path(result_dir, paste0(dataset, ".csv"))
+    outFig <- file.path(result_dir, paste0(dataset, ".svg"))
     
     if (dataset == "lymph_node") {
         synthetic <- FALSE
-        dbPath <- config$files$nest_database
-        annotPath <- file.path(data_dir, "cytospace", dataset, "fractional_abundances_by_spot.csv")
+        dbPath <- file.path(data_dir, "lymph_database.csv") # only contains ccl19-ccr7, since processing with the whole database took too long 
+        annotPath <- file.path(data_dir, dataset, "fractional_abundances_by_spot_broad_cell_types.csv")
     } else {
         synthetic <- TRUE
         dbPath <- list.files(path = dataPath, pattern = ".*lrdb\\.csv$", full.names = TRUE)[1]
         annotPath <- file.path(dataPath, "leiden.csv")
     }
     
-    runTWCOM(dataPath, dbPath, annotPath, outputPath, synthetic)
+    runTWCOM(dataPath, dbPath, annotPath, outputPath, outFig, synthetic)
 }
 
-main <- function() {
+main <- function(data_type_1, data_type_2) {
     config <- yaml::read_yaml("config.yml")
     result_dir <- file.path(config$directories$raw_result, "TWCOM")
     dir.create(result_dir, recursive = TRUE)
 
     datasets <- config$params$datasets
+    # datasets <- c("lymph_node")
+    datasets <- datasets[grepl("mechanistic", datasets) & grepl(data_type_1, datasets) & grepl(data_type_2, datasets)]
     
-    # Use mclapply for parallel processing
+    # use mclapply for parallel processing
     mclapply(datasets, process_dataset, config, mc.cores = detectCores() - 1)  # use all but one core
 }
 
-main()
+args <- commandArgs(trailingOnly = TRUE)
+
+main(args[1], args[2])
 
 
 
