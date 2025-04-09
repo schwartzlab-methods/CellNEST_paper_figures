@@ -57,12 +57,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument( '--data_name', type=str, default='PDAC_64630', help='The name of dataset') # 
-    parser.add_argument( '--model_name', type=str, default='NEST_PDAC_64630', help='Name of the trained model')
+    parser.add_argument( '--model_name', type=str, default='CellNEST_PDAC_64630', help='Name of the trained model')
     parser.add_argument( '--top_edge_count', type=int, default=1300 ,help='Number of the top communications to plot. To plot all insert -1') # 
 
-    parser.add_argument( '--barcode_info_file', type=str, default='NEST_figures_input_PDAC/PDAC_64630_barcode_info', help='Path to load the barcode information file produced during data preprocessing step')
-    parser.add_argument( '--selfloop_info_file', type=str, default='NEST_figures_input_PDAC/PDAC_64630_self_loop_record', help='Path to load the selfloop information file produced during data preprocessing step')
-    parser.add_argument( '--top_ccc_file', type=str, default='NEST_figures_input_PDAC/PDAC_64630_top20percent.csv', help='Path to load the selected top CCC file produced during data postprocessing step')
+    parser.add_argument( '--barcode_info_file', type=str, default='CellNEST_figures_input_PDAC/PDAC_64630_barcode_info', help='Path to load the barcode information file produced during data preprocessing step')
+    parser.add_argument( '--selfloop_info_file', type=str, default='CellNEST_figures_input_PDAC/PDAC_64630_self_loop_record', help='Path to load the selfloop information file produced during data preprocessing step')
+    parser.add_argument( '--top_ccc_file', type=str, default='CellNEST_figures_input_PDAC/PDAC_64630_top20percent.csv', help='Path to load the selected top CCC file produced during data postprocessing step')
     
     parser.add_argument( '--filter', type=int, default=1, help='Set --filter=1 if you want to filter the CCC')
     parser.add_argument( '--filter_by_component', type=int, default=10, help='Set component id, e.g., --filter_by_component=9 if you want to filter by component id')    
@@ -85,7 +85,7 @@ if __name__ == "__main__":
     for i in range (0, len(barcode_info)):
         barcode_type[barcode_info[i][0]] = ''
 
-    ######################### read the NEST output in csv format ####################################################
+    ######################### read the CellNEST output in csv format ####################################################
     inFile = args.top_ccc_file
     df = pd.read_csv(inFile, sep=",")
 
